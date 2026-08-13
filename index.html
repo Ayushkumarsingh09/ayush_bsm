@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>SPX BSM Options Analytics</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css"
+    />
+    <style>
+      html, body { margin: 0; padding: 0; background: #0e1117; }
+      #loading {
+        position: fixed; inset: 0; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; color: #e6e6e6;
+        font-family: sans-serif; background: #0e1117; z-index: 10;
+      }
+      #loading .bar {
+        width: 260px; height: 4px; background: #21262d; border-radius: 2px;
+        overflow: hidden; margin-top: 16px;
+      }
+      #loading .bar::after {
+        content: ""; display: block; width: 40%; height: 100%;
+        background: #ffc400; animation: slide 1.2s infinite;
+      }
+      @keyframes slide { 0% {margin-left: -40%;} 100% {margin-left: 100%;} }
+    </style>
+  </head>
+  <body>
+    <div id="loading">
+      <h2 style="margin: 0">SPX BSM Options Analytics</h2>
+      <p style="opacity: 0.7">
+        Loading the Python runtime in your browser (first load can take a
+        minute)&hellip;
+      </p>
+      <div class="bar"></div>
+    </div>
+    <div id="root"></div>
+    <script type="module">
+      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js";
+
+      const files = {};
+      const pyFiles = [
+        "app.py",
+        "config/__init__.py",
+        "config/settings.py",
+        "pricing/__init__.py",
+        "pricing/bsm.py",
+        "pricing/conventions.py",
+        "pricing/greeks.py",
+        "pricing/higher_order_greeks.py",
+        "pricing/implied_vol.py",
+        "pricing/registry.py",
+        "pricing/volatility.py",
+        "analytics/__init__.py",
+        "analytics/chain.py",
+        "data/__init__.py",
+        "data/base.py",
+        "data/bsm_workbook.py",
+        "data/csv_provider.py",
+        "data/live_provider.py",
+        "data/manual.py",
+        "data/market_quotes.py",
+        "data/yahoo_live.py",
+        "validation/__init__.py",
+        "validation/validators.py",
+        "utils/__init__.py",
+        "utils/dates.py",
+        "utils/formatting.py",
+        "utils/export.py",
+        "visualization/__init__.py",
+        "visualization/charts.py",
+        "visualization/option_chain.py",
+        "pricing/models.py",
+        "analytics/scenarios.py",
+      ];
+      for (const path of pyFiles) {
+        files[path] = { url: "./" + path };
+      }
+
+      mount(
+        {
+          entrypoint: "app.py",
+          files,
+          requirements: [
+            "numpy",
+            "scipy",
+            "pandas",
+            "plotly",
+            "openpyxl",
+            "XlsxWriter",
+          ],
+          streamlitConfig: {
+            "theme.base": "dark",
+            "theme.primaryColor": "#ffc400",
+            "theme.backgroundColor": "#0e1117",
+            "theme.secondaryBackgroundColor": "#161b22",
+            "theme.textColor": "#e6e6e6",
+            "client.toolbarMode": "viewer",
+          },
+        },
+        document.getElementById("root"),
+      ).then(() => {
+        const el = document.getElementById("loading");
+        if (el) el.remove();
+      });
+      // Remove the splash once Streamlit renders, even if the promise
+      // resolves earlier than first paint.
+      const observer = new MutationObserver(() => {
+        const root = document.getElementById("root");
+        if (root && root.childElementCount > 0) {
+          const el = document.getElementById("loading");
+          if (el) el.remove();
+          observer.disconnect();
+        }
+      });
+      observer.observe(document.getElementById("root"), { childList: true });
+    </script>
+  </body>
+</html>
