@@ -2,8 +2,12 @@
 
 Uses a cookie + crumb session for option endpoints. Spot/rate/VIX use the
 public chart API with query1/query2 failover. Stooq is a last-resort spot
-fallback. Quotes are never fabricated — empty/failed fetches raise or return
-empty frames with explicit provenance.
+fallback.
+
+GitHub Pages / stlite (Pyodide) cannot call Yahoo directly because browsers
+enforce CORS. In that environment we load ``sample_data/live_cache.json``
+(refreshed by ``scripts/refresh_live_cache.py`` / GitHub Actions). Quotes are
+never fabricated.
 """
 
 from __future__ import annotations
@@ -11,12 +15,14 @@ from __future__ import annotations
 import json
 import logging
 import math
+import sys
 import http.cookiejar
 import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -33,6 +39,149 @@ _OPTION_SYMBOL = {
     "^GSPC": "^SPX",
     "SPY": "SPY",
 }
+
+_CACHE: dict[str, Any] | None = None
+
+
+def _is_browser() -> bool:
+    """True under Pyodide / stlite (Emscripten)."""
+    return sys.platform == "emscripten"
+
+
+def _parse_asof(text: str | None) -> datetime:
+    if not text:
+        return datetime.now(timezone.utc).replace(tzinfo=None)
+    t = str(text).strip().rstrip("Z").replace("T", " ")
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(t[: min(len(t), 19)], fmt)
+        except ValueError:
+            continue
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+def load_live_cache(force: bool = False) -> dict[str, Any]:
+    """Load the Pages-safe live cache from VFS / disk / jsDelivr."""
+    global _CACHE
+    if _CACHE is not None and not force:
+        return _CACHE
+
+    candidates = [
+        Path("sample_data/live_cache.json"),
+        Path(__file__).resolve().parents[1] / "sample_data" / "live_cache.json",
+    ]
+    for path in candidates:
+        try:
+            if path.is_file():
+                _CACHE = json.loads(path.read_text(encoding="utf-8"))
+                return _CACHE
+        except Exception as exc:
+            logger.warning("Cache read failed for %s: %s", path, exc)
+
+    # CORS-friendly CDN mirror of the repo file (GitHub Pages fallback).
+    urls = (
+        "https://cdn.jsdelivr.net/gh/Ayushkumarsingh09/ayush_bsm@main/"
+        "sample_data/live_cache.json",
+        "https://raw.githubusercontent.com/Ayushkumarsingh09/ayush_bsm/main/"
+        "sample_data/live_cache.json",
+    )
+    for url in urls:
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": _UA})
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                _CACHE = json.loads(resp.read().decode("utf-8"))
+                return _CACHE
+        except Exception as exc:
+            logger.warning("Cache URL failed %s: %s", url, exc)
+
+    raise RuntimeError(
+        "Live cache unavailable. On GitHub Pages, ensure "
+        "sample_data/live_cache.json is deployed. Locally, run "
+        "`python scripts/refresh_live_cache.py` or use a network that can "
+        "reach Yahoo Finance."
+    )
+
+
+def _snapshot_from_cache(underlying: str) -> LiveSnapshot:
+    cache = load_live_cache()
+    u = underlying.strip().upper()
+    if u in {"ES=F", "FUTURES"}:
+        u = "ES"
+    block = (cache.get("snapshots") or {}).get(u)
+    if not block:
+        raise RuntimeError(f"No cached snapshot for {u}")
+    generated = cache.get("generated_at", "?")
+    return LiveSnapshot(
+        symbol=str(block.get("symbol") or u),
+        spot=float(block["spot"]),
+        asof=_parse_asof(block.get("asof")),
+        risk_free_rate=(None if block.get("risk_free_rate") is None
+                        else float(block["risk_free_rate"])),
+        rate_source=block.get("rate_source"),
+        dividend_yield=(None if block.get("dividend_yield") is None
+                        else float(block["dividend_yield"])),
+        dividend_source=block.get("dividend_source"),
+        vix=(None if block.get("vix") is None else float(block["vix"])),
+        source=(f"Pages live-cache ({generated}) · "
+                f"{block.get('source', u)}"),
+        spot_sources=("live_cache",),
+    )
+
+
+def _chain_from_cache(underlying: str) -> LiveOptionChain:
+    cache = load_live_cache()
+    u = underlying.strip().upper()
+    if u in {"ES=F", "FUTURES"}:
+        u = "ES"
+    block = (cache.get("option_chains") or {}).get(u)
+    if not block:
+        raise RuntimeError(f"No cached option chain for {u}")
+    rows = block.get("rows") or []
+    frame = pd.DataFrame(rows)
+    if frame.empty or "strike" not in frame.columns:
+        raise RuntimeError(f"Cached option chain for {u} is empty")
+    generated = cache.get("generated_at", "?")
+    return LiveOptionChain(
+        underlying=u,
+        yahoo_symbol=str(block.get("yahoo_symbol") or _option_yahoo_symbol(u)),
+        spot=float(block.get("spot") or frame["strike"].median()),
+        expiry=_parse_asof(block.get("expiry")),
+        asof=_parse_asof(block.get("asof")),
+        frame=frame,
+        source=(f"Pages live-cache ({generated}) · "
+                f"{block.get('source', u)}"),
+        expiries_available=(),
+    )
+
+
+def _surface_from_cache(underlying: str) -> list[LiveOptionChain]:
+    cache = load_live_cache()
+    u = underlying.strip().upper()
+    if u in {"ES=F", "FUTURES"}:
+        u = "ES"
+    blocks = (cache.get("surface_chains") or {}).get(u) or []
+    out: list[LiveOptionChain] = []
+    generated = cache.get("generated_at", "?")
+    for block in blocks:
+        rows = block.get("rows") or []
+        frame = pd.DataFrame(rows)
+        if frame.empty:
+            continue
+        out.append(LiveOptionChain(
+            underlying=u,
+            yahoo_symbol=str(block.get("yahoo_symbol") or "^SPX"),
+            spot=float(block.get("spot") or frame["strike"].median()),
+            expiry=_parse_asof(block.get("expiry")),
+            asof=_parse_asof(block.get("asof")),
+            frame=frame,
+            source=(f"Pages live-cache ({generated}) · "
+                    f"{block.get('source', u)}"),
+            expiries_available=(),
+        ))
+    if not out:
+        # Fall back to single cached chain
+        out = [_chain_from_cache(u)]
+    return out
 
 
 @dataclass(frozen=True)
@@ -204,7 +353,26 @@ def _spot_with_failover(symbol: str, timeout: float = 15.0
 
 def fetch_live_snapshot(underlying: str = "SPX",
                         timeout: float = 15.0) -> LiveSnapshot:
-    """Fetch a live snapshot for SPX (cash), SPY, or ES (futures)."""
+    """Fetch a live snapshot for SPX (cash), SPY, or ES (futures).
+
+    Under Pyodide / GitHub Pages, Yahoo is blocked by CORS — uses the
+    deployed ``live_cache.json`` instead (still real Yahoo data, cached).
+    """
+    if _is_browser():
+        return _snapshot_from_cache(underlying)
+
+    try:
+        return _fetch_live_snapshot_network(underlying, timeout=timeout)
+    except RuntimeError as exc:
+        logger.warning("Live network snapshot failed (%s); trying cache", exc)
+        try:
+            return _snapshot_from_cache(underlying)
+        except RuntimeError:
+            raise exc from None
+
+
+def _fetch_live_snapshot_network(underlying: str = "SPX",
+                                 timeout: float = 15.0) -> LiveSnapshot:
     u = underlying.strip().upper()
     if u in {"ES", "ES=F", "FUTURES"}:
         spot_sym = "ES=F"
@@ -234,7 +402,6 @@ def fetch_live_snapshot(underlying: str = "SPX",
         logger.warning("IRX fetch failed: %s", exc)
         try:
             tnx, _, src = _chart_last("^TNX", timeout=timeout)
-            # 10Y is a coarser proxy — label clearly.
             rate = tnx / 100.0
             rate_src = f"^TNX (10Y) fallback via {src} — prefer IRX when available"
         except RuntimeError as exc2:
@@ -277,6 +444,25 @@ def list_option_expiries(underlying: str = "SPX",
 
     Past-dated expiries relative to ``asof`` (default: UTC now) are dropped.
     """
+    if _is_browser():
+        cache = load_live_cache()
+        u = underlying.strip().upper()
+        if u in {"ES=F", "FUTURES"}:
+            u = "ES"
+        out: list[datetime] = []
+        block = (cache.get("option_chains") or {}).get(u)
+        if block and block.get("expiry"):
+            out.append(_parse_asof(block["expiry"]))
+        for b in (cache.get("surface_chains") or {}).get(u) or []:
+            if b.get("expiry"):
+                out.append(_parse_asof(b["expiry"]))
+        # unique sorted
+        uniq = sorted({e.replace(hour=0, minute=0, second=0, microsecond=0)
+                       for e in out})
+        if uniq:
+            return uniq
+        raise RuntimeError(f"No cached expiries for {u}")
+
     sym = _option_yahoo_symbol(underlying)
     session = _get_session(timeout=timeout)
     url = ("https://query2.finance.yahoo.com/v7/finance/options/"
@@ -294,7 +480,6 @@ def list_option_expiries(underlying: str = "SPX",
         for ts in stamps
     ]
     cutoff = asof or datetime.now(timezone.utc).replace(tzinfo=None)
-    # Keep expiry if calendar date >= asof date (same-day options still valid).
     future = [e for e in expiries if e.date() >= cutoff.date()]
     return future or expiries
 
@@ -320,13 +505,39 @@ def fetch_option_chain(
 
     For ES underliers, Yahoo has no ES options — ``^SPX`` chain is returned
     and ``source`` is labeled as an explicit SPX proxy surface.
+
+    Under Pyodide / GitHub Pages, loads the deployed live cache (CORS-safe).
     """
+    if _is_browser():
+        # Cache stores one primary chain (+ surface slices). Expiry arg is
+        # advisory — pick matching surface slice when possible.
+        if expiry is not None:
+            for chain in _surface_from_cache(underlying):
+                if chain.expiry.date() == expiry.date():
+                    return chain
+        return _chain_from_cache(underlying)
+
+    try:
+        return _fetch_option_chain_network(underlying, expiry=expiry,
+                                           timeout=timeout)
+    except Exception as exc:
+        logger.warning("Live option fetch failed (%s); trying cache", exc)
+        try:
+            return _chain_from_cache(underlying)
+        except RuntimeError:
+            raise RuntimeError(str(exc)) from exc
+
+
+def _fetch_option_chain_network(
+    underlying: str = "SPX",
+    expiry: datetime | None = None,
+    timeout: float = 25.0,
+) -> LiveOptionChain:
     u = underlying.strip().upper()
     sym = _option_yahoo_symbol(u)
     session = _get_session(timeout=timeout)
 
     if expiry is None:
-        # Default to the nearest *future* listed expiry.
         future = list_option_expiries(u, timeout=timeout)
         if not future:
             raise RuntimeError(f"No listed expiries for {sym}")
@@ -337,7 +548,6 @@ def fetch_option_chain(
     params: dict[str, str] = {}
     if session.crumb:
         params["crumb"] = session.crumb
-    # Yahoo expects unix seconds at UTC midnight of the expiry date.
     exp_utc = datetime(expiry.year, expiry.month, expiry.day,
                        tzinfo=timezone.utc)
     params["date"] = str(int(exp_utc.timestamp()))
@@ -397,7 +607,7 @@ def fetch_option_chain(
 
     asof_ts = quote.get("regularMarketTime")
     asof = (datetime.fromtimestamp(asof_ts, tz=timezone.utc).replace(tzinfo=None)
-            if asof_ts else datetime.utcnow())
+            if asof_ts else datetime.now(timezone.utc).replace(tzinfo=None))
 
     proxy_note = ""
     if u in {"ES", "ES=F"}:
@@ -421,6 +631,10 @@ def fetch_multi_expiry_surface(
     timeout: float = 25.0,
 ) -> list[LiveOptionChain]:
     """Fetch several near-dated expiries for a volatility surface."""
+    if _is_browser():
+        slices = _surface_from_cache(underlying)
+        return slices[: max(1, int(max_expiries))]
+
     expiries = list_option_expiries(underlying, timeout=timeout)
     if not expiries:
         raise RuntimeError("No option expiries available")

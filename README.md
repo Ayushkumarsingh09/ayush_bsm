@@ -162,6 +162,10 @@ builds a **multi-expiry IV surface**, 25Δ skew metrics, and can price the chain
 on the live market IV smile. ES uses live futures spot with an explicit SPX
 options vol-surface proxy (labeled in the UI). Quotes are **never fabricated**.
 
+On **GitHub Pages / stlite**, browsers block Yahoo (CORS). The hosted demo
+loads `sample_data/live_cache.json` (real Yahoo data, refreshed by Actions).
+Local `streamlit run app.py` still hits Yahoo live.
+
 ---
 
 ## Project structure

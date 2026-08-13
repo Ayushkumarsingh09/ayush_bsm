@@ -164,7 +164,10 @@ def sidebar_live_inputs() -> SidebarMarketState | None:
         st.sidebar.info(
             "Fetches live spot (Yahoo chart + Stooq failover), ^IRX/^TNX "
             "rate, VIX, and — when enabled — real option bid/ask chains "
-            "plus a volatility surface. Quotes are never invented.")
+            "plus a volatility surface. On GitHub Pages, Yahoo is blocked "
+            "by browser CORS — the app uses the deployed live_cache.json "
+            "(auto-refreshed). Local Streamlit still hits Yahoo live. "
+            "Quotes are never invented.")
         return None
     if fetch or "live_state" in st.session_state:
         if fetch:

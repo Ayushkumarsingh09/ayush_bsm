@@ -106,6 +106,7 @@
         "visualization/__init__.py",
         "visualization/charts.py",
         "visualization/option_chain.py",
+        "sample_data/live_cache.json",
       ];
 
       const files = {};
@@ -113,9 +114,8 @@
         files[path] = { url: "./" + path };
       }
 
-      // Lean requirements: pyodide wheels for numpy/scipy/pandas are fast.
-      // Excel engines install on demand if available; app still boots without them.
-      const requirements = ["numpy", "scipy", "pandas", "plotly"];
+      // numpy/scipy/pandas are Pyodide-native (fast). plotly + openpyxl via micropip.
+      const requirements = ["numpy", "scipy", "pandas", "plotly", "openpyxl"];
 
       setStatus("Downloading Python packages (numpy, scipy, pandas, plotly)…");
 
