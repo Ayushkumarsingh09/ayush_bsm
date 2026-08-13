@@ -44,7 +44,22 @@ def _safe_iv(price: float, spot: float, strike: float, T: float,
 
 def mid_iv_row(row: pd.Series, spot: float, T: float, r: float, q: float
                ) -> tuple[float | None, float | None, float | None]:
-    """Return (call_iv, put_iv, blended_iv) from mids; Yahoo IV as fallback."""
+    """Return (call_iv, put_iv, blended_iv).
+
+    Prefers Yahoo-reported IV when present (fast, market-derived). Solves
+    mid→IV only when Yahoo IV is missing — avoids hanging the UI on 200+
+    Brent inversions per expiry.
+    """
+    def _yahoo(side: str) -> float | None:
+        y = row.get(f"{side}_yahoo_iv")
+        try:
+            yf = float(y) if y is not None else None
+            if yf is not None and np.isfinite(yf) and 1e-4 < yf < 5.0:
+                return yf
+        except (TypeError, ValueError):
+            pass
+        return None
+
     def _mid(bid, ask, last):
         b = row.get(bid)
         a = row.get(ask)
@@ -65,28 +80,15 @@ def mid_iv_row(row: pd.Series, spot: float, T: float, r: float, q: float
         return None
 
     k = float(row["strike"])
-    cm = _mid("call_bid", "call_ask", "call_last")
-    pm = _mid("put_bid", "put_ask", "put_last")
-    civ = _safe_iv(cm, spot, k, T, r, q, True) if cm is not None else None
-    piv = _safe_iv(pm, spot, k, T, r, q, False) if pm is not None else None
+    civ = _yahoo("call")
+    piv = _yahoo("put")
 
-    # Yahoo-reported IV fallback (still market-derived, not fabricated).
     if civ is None:
-        y = row.get("call_yahoo_iv")
-        try:
-            yf = float(y) if y is not None else None
-            if yf is not None and np.isfinite(yf) and 1e-4 < yf < 5.0:
-                civ = yf
-        except (TypeError, ValueError):
-            pass
+        cm = _mid("call_bid", "call_ask", "call_last")
+        civ = _safe_iv(cm, spot, k, T, r, q, True) if cm is not None else None
     if piv is None:
-        y = row.get("put_yahoo_iv")
-        try:
-            yf = float(y) if y is not None else None
-            if yf is not None and np.isfinite(yf) and 1e-4 < yf < 5.0:
-                piv = yf
-        except (TypeError, ValueError):
-            pass
+        pm = _mid("put_bid", "put_ask", "put_last")
+        piv = _safe_iv(pm, spot, k, T, r, q, False) if pm is not None else None
 
     blend = None
     if civ is not None and piv is not None:

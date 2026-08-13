@@ -49,6 +49,10 @@ fully capture. This is an analytics tool — not trading advice.
 Open **[https://Ayushkumarsingh09.github.io/ayush_bsm/](https://Ayushkumarsingh09.github.io/ayush_bsm/)** — the Streamlit app runs in-browser via
 [stlite](https://github.com/whitphx/stlite) / Pyodide. No server required.
 
+Use **Chrome or Edge** (Firefox is unreliable with stlite). First load downloads
+a Wasm Python runtime (~1–2 minutes). For live Yahoo option chains, prefer the
+local run below — browser CORS can block some market fetches.
+
 ### Local
 
 ```bash

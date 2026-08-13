@@ -105,12 +105,25 @@ def to_excel_bytes(df: pd.DataFrame, meta: ChainMeta, inputs: dict,
     meta_df = pd.DataFrame(_metadata_rows(meta, inputs, conventions),
                            columns=["Field", "Value"])
     buf = io.BytesIO()
-    with pd.ExcelWriter(buf, engine="xlsxwriter") as writer:
+    try:
+        engine = "xlsxwriter"
+        import xlsxwriter  # noqa: F401
+    except ImportError:
+        try:
+            import openpyxl  # noqa: F401
+            engine = "openpyxl"
+        except ImportError as exc:
+            raise RuntimeError(
+                "Excel export requires xlsxwriter or openpyxl. "
+                "CSV download still works."
+            ) from exc
+    with pd.ExcelWriter(buf, engine=engine) as writer:
         export.to_excel(writer, sheet_name="Option Chain", index=False)
         meta_df.to_excel(writer, sheet_name="Inputs & Conventions", index=False)
-        wb = writer.book
-        ws = writer.sheets["Option Chain"]
-        num_fmt = wb.add_format({"num_format": "#,##0.000000"})
-        ws.set_column(0, len(export.columns) - 1, 16, num_fmt)
-        writer.sheets["Inputs & Conventions"].set_column(0, 1, 40)
+        if engine == "xlsxwriter":
+            wb = writer.book
+            ws = writer.sheets["Option Chain"]
+            num_fmt = wb.add_format({"num_format": "#,##0.000000"})
+            ws.set_column(0, len(export.columns) - 1, 16, num_fmt)
+            writer.sheets["Inputs & Conventions"].set_column(0, 1, 40)
     return buf.getvalue()

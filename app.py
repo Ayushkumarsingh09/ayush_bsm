@@ -150,13 +150,14 @@ def sidebar_live_inputs() -> SidebarMarketState | None:
         "Fetch live option chain (bid/ask)", value=True,
         help="Real Yahoo option quotes via crumb session. Never fabricated.")
     fetch_surf = st.sidebar.checkbox(
-        "Build multi-expiry vol surface", value=True,
-        help="Loads several listed expiries for the 3D IV surface.")
+        "Build multi-expiry vol surface", value=False,
+        help="Loads several listed expiries for the 3D IV surface. "
+             "Slightly slower — enable after the first live chain works.")
     price_smile = st.sidebar.checkbox(
         "Price chain on live market IV smile", value=True,
         help="Uses per-strike IVs implied from live mids (or Yahoo IV "
              "fallback). Strongest market alignment for European pricing.")
-    n_exp = st.sidebar.slider("Surface expiries", 2, 8, 5)
+    n_exp = st.sidebar.slider("Surface expiries", 2, 8, 3)
     fetch = st.sidebar.button("FETCH LIVE MARKET", type="secondary",
                               width="stretch")
     if not fetch and "live_state" not in st.session_state:
@@ -168,7 +169,11 @@ def sidebar_live_inputs() -> SidebarMarketState | None:
     if fetch or "live_state" in st.session_state:
         if fetch:
             try:
-                with st.spinner("Fetching live market…"):
+                with st.spinner(
+                    "Fetching live market (spot → options"
+                    + (" → surface" if fetch_surf and fetch_opts else "")
+                    + ")…"
+                ):
                     provider = LiveMarketDataProvider(
                         underlying=underlying,
                         dte_days=float(dte),
@@ -179,68 +184,88 @@ def sidebar_live_inputs() -> SidebarMarketState | None:
                     mi = provider.get_market_inputs()
             except DataProviderError as exc:
                 st.sidebar.error(str(exc))
+                st.session_state.pop("live_state", None)
+                return None
+            except Exception as exc:
+                logger.exception("Live market fetch failed")
+                st.sidebar.error(
+                    f"Live fetch failed: {type(exc).__name__}: {exc}"
+                )
+                st.session_state.pop("live_state", None)
                 return None
 
-            file_strikes = file_sigmas = None
-            use_file = False
-            market_table = provider.market_table()
-            if price_smile and market_table is not None:
-                smile = provider.smile_strikes_sigmas(
-                    mi.risk_free_rate, mi.dividend_yield)
-                if smile is not None:
-                    file_strikes, file_sigmas = smile
-                    use_file = True
+            try:
+                file_strikes = file_sigmas = None
+                use_file = False
+                market_table = provider.market_table()
+                if price_smile and market_table is not None:
+                    smile = provider.smile_strikes_sigmas(
+                        mi.risk_free_rate, mi.dividend_yield)
+                    if smile is not None:
+                        file_strikes, file_sigmas = smile
+                        use_file = True
 
-            surface_payload = None
-            if provider.surface_slices:
-                from analytics.vol_surface import build_surface_table
-                slices = [
-                    (c.expiry, c.spot, c.frame) for c in provider.surface_slices
-                ]
-                surface_df = build_surface_table(
-                    slices, mi.spot, mi.risk_free_rate, mi.dividend_yield,
-                    asof=mi.asof,
+                surface_payload = None
+                if provider.surface_slices:
+                    from analytics.vol_surface import build_surface_table
+                    slices = [
+                        (c.expiry, c.spot, c.frame)
+                        for c in provider.surface_slices
+                    ]
+                    surface_df = build_surface_table(
+                        slices, mi.spot, mi.risk_free_rate, mi.dividend_yield,
+                        asof=mi.asof,
+                    )
+                    surface_payload = surface_df.to_dict(orient="list")
+
+                skew_payload = None
+                if market_table is not None:
+                    from analytics.vol_surface import compute_skew_metrics
+                    from utils.dates import DayCount, time_to_expiry
+                    T_live = time_to_expiry(
+                        mi.expiry, now=mi.asof, convention=DayCount.ACT_365)
+                    skew = compute_skew_metrics(
+                        market_table, mi.spot, max(T_live, 1e-6),
+                        mi.risk_free_rate, mi.dividend_yield,
+                        expiry=mi.expiry)
+                    skew_payload = {
+                        "atm_iv": skew.atm_iv,
+                        "put_25d_iv": skew.put_25d_iv,
+                        "call_25d_iv": skew.call_25d_iv,
+                        "risk_reversal_25d": skew.risk_reversal_25d,
+                        "butterfly_25d": skew.butterfly_25d,
+                        "skew_slope": skew.skew_slope,
+                        "n_points": skew.n_points,
+                    }
+
+                contract = {"SPX": "SPX", "SPY": "SPY", "ES": "ES"}.get(
+                    underlying, underlying)
+                state = SidebarMarketState(
+                    market_inputs=mi,
+                    use_file_strikes=use_file,
+                    file_strikes=file_strikes,
+                    file_sigmas=file_sigmas,
+                    contract=contract,
+                    market_table=market_table,
+                    interpretations=list(provider.interpretations),
                 )
-                surface_payload = surface_df.to_dict(orient="list")
-
-            skew_payload = None
-            if market_table is not None:
-                from analytics.vol_surface import compute_skew_metrics
-                from utils.dates import DayCount, time_to_expiry
-                T_live = time_to_expiry(
-                    mi.expiry, now=mi.asof, convention=DayCount.ACT_365)
-                skew = compute_skew_metrics(
-                    market_table, mi.spot, max(T_live, 1e-6),
-                    mi.risk_free_rate, mi.dividend_yield, expiry=mi.expiry)
-                skew_payload = {
-                    "atm_iv": skew.atm_iv,
-                    "put_25d_iv": skew.put_25d_iv,
-                    "call_25d_iv": skew.call_25d_iv,
-                    "risk_reversal_25d": skew.risk_reversal_25d,
-                    "butterfly_25d": skew.butterfly_25d,
-                    "skew_slope": skew.skew_slope,
-                    "n_points": skew.n_points,
-                }
-
-            contract = {"SPX": "SPX", "SPY": "SPY", "ES": "ES"}.get(
-                underlying, underlying)
-            state = SidebarMarketState(
-                market_inputs=mi,
-                use_file_strikes=use_file,
-                file_strikes=file_strikes,
-                file_sigmas=file_sigmas,
-                contract=contract,
-                market_table=market_table,
-                interpretations=list(provider.interpretations),
-            )
-            st.session_state["live_state"] = state
-            st.session_state["live_surface"] = surface_payload
-            st.session_state["live_skew"] = skew_payload
+                st.session_state["live_state"] = state
+                st.session_state["live_surface"] = surface_payload
+                st.session_state["live_skew"] = skew_payload
+            except Exception as exc:
+                logger.exception("Live post-process failed")
+                st.sidebar.error(
+                    f"Live data fetched but processing failed: "
+                    f"{type(exc).__name__}: {exc}"
+                )
+                st.session_state.pop("live_state", None)
+                return None
         else:
             state = st.session_state["live_state"]
 
         for note in (state.interpretations or []):
             st.sidebar.caption(f"ℹ️ {note}")
+        st.sidebar.success("Live market ready — click CALCULATE OPTION CHAIN.")
         return state
     return None
 
@@ -546,7 +571,8 @@ def render_vol_surface_tab(df: pd.DataFrame, meta, inputs: dict) -> None:
     st.subheader("Volatility Surface & Skew")
     st.caption(
         "Surface and smile are built from **live or file market quotes** "
-        "(mid→IV, with Yahoo IV only as fallback). No fabricated vols."
+        "(Yahoo IV preferred; mid→IV only when Yahoo IV is missing). "
+        "No fabricated vols."
     )
     skew = st.session_state.get("live_skew") or inputs.get("skew")
     if skew:
@@ -593,22 +619,25 @@ def render_vol_surface_tab(df: pd.DataFrame, meta, inputs: dict) -> None:
                        or inputs.get("surface_records"))
     if surface_records:
         surface = pd.DataFrame(surface_records)
-        st.plotly_chart(
-            charts.vol_surface_chart(surface),
-            width="stretch",
-        )
-        st.dataframe(
-            surface[["expiry", "T", "strike", "moneyness", "market_iv"]]
-            .assign(
-                T_days=lambda x: x["T"] * 365.0,
-                market_iv_pct=lambda x: x["market_iv"] * 100.0,
-            )[["expiry", "T_days", "strike", "moneyness", "market_iv_pct"]]
-            .rename(columns={
-                "T_days": "T (days)",
-                "market_iv_pct": "IV %",
-            }),
-            height=320,
-        )
+        try:
+            st.plotly_chart(
+                charts.vol_surface_chart(surface),
+                width="stretch",
+            )
+        except Exception as exc:
+            logger.exception("Vol surface chart failed")
+            st.warning(f"Surface chart could not render: {exc}")
+        show_cols = [c for c in ["expiry", "T", "strike", "moneyness", "market_iv"]
+                     if c in surface.columns]
+        if show_cols:
+            view = surface[show_cols].copy()
+            if "T" in view.columns:
+                view["T (days)"] = view["T"] * 365.0
+            if "market_iv" in view.columns:
+                view["IV %"] = view["market_iv"] * 100.0
+            keep = [c for c in ["expiry", "T (days)", "strike", "moneyness", "IV %"]
+                    if c in view.columns]
+            st.dataframe(view[keep], height=320)
     else:
         st.info(
             "Multi-expiry surface unavailable. Enable **Build multi-expiry "

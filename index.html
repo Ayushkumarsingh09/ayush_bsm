@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -7,7 +7,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <title>SPX BSM Options Analytics</title>
+    <title>ayush_bsm — SPX BSM Options Analytics</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css"
@@ -17,10 +17,11 @@
       #loading {
         position: fixed; inset: 0; display: flex; flex-direction: column;
         align-items: center; justify-content: center; color: #e6e6e6;
-        font-family: sans-serif; background: #0e1117; z-index: 10;
+        font-family: system-ui, sans-serif; background: #0e1117; z-index: 10;
+        padding: 24px; text-align: center;
       }
       #loading .bar {
-        width: 260px; height: 4px; background: #21262d; border-radius: 2px;
+        width: 280px; height: 4px; background: #21262d; border-radius: 2px;
         overflow: hidden; margin-top: 16px;
       }
       #loading .bar::after {
@@ -28,22 +29,49 @@
         background: #ffc400; animation: slide 1.2s infinite;
       }
       @keyframes slide { 0% {margin-left: -40%;} 100% {margin-left: 100%;} }
+      #loading .status { opacity: 0.75; max-width: 420px; line-height: 1.45; }
+      #loading.error .bar { display: none; }
+      #loading.error .status { color: #ff8a8a; white-space: pre-wrap; text-align: left; }
+      #loading .hint { opacity: 0.55; font-size: 0.85rem; margin-top: 12px; max-width: 420px; }
     </style>
   </head>
   <body>
     <div id="loading">
-      <h2 style="margin: 0">SPX BSM Options Analytics</h2>
-      <p style="opacity: 0.7">
-        Loading the Python runtime in your browser (first load can take a
-        minute)&hellip;
+      <h2 style="margin: 0">ayush_bsm</h2>
+      <p class="status" id="load-status">
+        Starting in-browser Python runtime (first load can take 1–2 minutes)…
       </p>
       <div class="bar"></div>
+      <p class="hint">
+        Tip: use Chrome/Edge. Firefox is unreliable with stlite.
+        For full live Yahoo feeds, run locally:
+        <code>streamlit run app.py</code>
+      </p>
     </div>
     <div id="root"></div>
     <script type="module">
       import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js";
 
-      const files = {};
+      const statusEl = document.getElementById("load-status");
+      const loadingEl = document.getElementById("loading");
+
+      function setStatus(msg) {
+        if (statusEl) statusEl.textContent = msg;
+      }
+
+      function showError(err) {
+        if (!loadingEl) return;
+        loadingEl.classList.add("error");
+        const detail = err && (err.stack || err.message || String(err));
+        setStatus("Failed to start the browser app:\n\n" + detail);
+      }
+
+      function hideLoading() {
+        if (loadingEl) loadingEl.remove();
+      }
+
+      // mount() returns a controller object (NOT a Promise). Clearing the
+      // splash via .then() previously threw and left the page stuck forever.
       const pyFiles = [
         "app.py",
         "config/__init__.py",
@@ -56,6 +84,7 @@
         "pricing/implied_vol.py",
         "pricing/registry.py",
         "pricing/volatility.py",
+        "pricing/models.py",
         "analytics/__init__.py",
         "analytics/chain.py",
         "analytics/scenarios.py",
@@ -77,49 +106,78 @@
         "visualization/__init__.py",
         "visualization/charts.py",
         "visualization/option_chain.py",
-        "pricing/models.py",
       ];
+
+      const files = {};
       for (const path of pyFiles) {
         files[path] = { url: "./" + path };
       }
 
-      mount(
-        {
-          entrypoint: "app.py",
-          files,
-          requirements: [
-            "numpy",
-            "scipy",
-            "pandas",
-            "plotly",
-            "openpyxl",
-            "XlsxWriter",
-          ],
-          streamlitConfig: {
-            "theme.base": "dark",
-            "theme.primaryColor": "#ffc400",
-            "theme.backgroundColor": "#0e1117",
-            "theme.secondaryBackgroundColor": "#161b22",
-            "theme.textColor": "#e6e6e6",
-            "client.toolbarMode": "viewer",
-          },
-        },
-        document.getElementById("root"),
-      ).then(() => {
-        const el = document.getElementById("loading");
-        if (el) el.remove();
-      });
-      // Remove the splash once Streamlit renders, even if the promise
-      // resolves earlier than first paint.
+      // Lean requirements: pyodide wheels for numpy/scipy/pandas are fast.
+      // Excel engines install on demand if available; app still boots without them.
+      const requirements = ["numpy", "scipy", "pandas", "plotly"];
+
+      setStatus("Downloading Python packages (numpy, scipy, pandas, plotly)…");
+
       const observer = new MutationObserver(() => {
         const root = document.getElementById("root");
         if (root && root.childElementCount > 0) {
-          const el = document.getElementById("loading");
-          if (el) el.remove();
+          hideLoading();
           observer.disconnect();
         }
       });
-      observer.observe(document.getElementById("root"), { childList: true });
+      observer.observe(document.getElementById("root"), {
+        childList: true,
+        subtree: true,
+      });
+
+      // Safety net if Streamlit mounts slowly but root stays empty briefly.
+      const bootStarted = Date.now();
+      const tick = setInterval(() => {
+        const root = document.getElementById("root");
+        if (root && root.querySelector("iframe, [data-testid], .stApp, section")) {
+          hideLoading();
+          clearInterval(tick);
+          return;
+        }
+        const elapsed = Math.round((Date.now() - bootStarted) / 1000);
+        if (elapsed === 20) {
+          setStatus("Still loading Wasm packages… (~20s). Please wait.");
+        } else if (elapsed === 60) {
+          setStatus("Still loading… (~60s). First visit downloads a large runtime.");
+        } else if (elapsed >= 180) {
+          clearInterval(tick);
+          showError(
+            new Error(
+              "Timed out after 3 minutes. Check the browser console, try Chrome, " +
+                "or hard-refresh (Ctrl+Shift+R). Local run: streamlit run app.py"
+            )
+          );
+        }
+      }, 2000);
+
+      try {
+        mount(
+          {
+            entrypoint: "app.py",
+            files,
+            requirements,
+            streamlitConfig: {
+              "theme.base": "dark",
+              "theme.primaryColor": "#ffc400",
+              "theme.backgroundColor": "#0e1117",
+              "theme.secondaryBackgroundColor": "#161b22",
+              "theme.textColor": "#e6e6e6",
+              "client.toolbarMode": "viewer",
+            },
+          },
+          document.getElementById("root"),
+        );
+        setStatus("Runtime started — compiling the Streamlit app…");
+      } catch (err) {
+        clearInterval(tick);
+        showError(err);
+      }
     </script>
   </body>
 </html>

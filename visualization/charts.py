@@ -208,6 +208,8 @@ def vol_surface_chart(surface: pd.DataFrame,
         hovertemplate=("K=%{x:,.0f}<br>T=%{y:.1f}d<br>IV=%{z:.2f}%"
                        "<extra></extra>"),
     )])
+    layout_kwargs = {k: v for k, v in _LAYOUT.items()
+                     if k not in {"hovermode", "margin"}}
     fig.update_layout(
         title=title,
         scene=dict(
@@ -216,8 +218,8 @@ def vol_surface_chart(surface: pd.DataFrame,
             zaxis_title="IV (%)",
             bgcolor="rgba(17,20,24,1)",
         ),
-        **{k: v for k, v in _LAYOUT.items() if k != "hovermode"},
         margin=dict(l=10, r=10, t=48, b=10),
+        **layout_kwargs,
     )
     return fig
 
