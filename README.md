@@ -1,5 +1,7 @@
 # ayush_bsm — SPX / ES BSM Options Analytics Terminal
 
+[![Live Demo](https://img.shields.io/badge/demo-GitHub%20Pages-0A7B3E)](https://Ayushkumarsingh09.github.io/ayush_bsm/) [![Python](https://img.shields.io/badge/python-3.10%2B-3776AB)](https://www.python.org/)
+
 Production-grade **Black–Scholes–Merton** and **Black-76** options analytics
 for SPX (cash) and ES (futures) style European options.
 
