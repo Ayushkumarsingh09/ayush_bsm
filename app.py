@@ -159,7 +159,7 @@ def sidebar_live_inputs() -> SidebarMarketState | None:
              "fallback). Strongest market alignment for European pricing.")
     n_exp = st.sidebar.slider("Surface expiries", 2, 8, 3)
     fetch = st.sidebar.button("FETCH LIVE MARKET", type="secondary",
-                              width="stretch")
+                              use_container_width=True)
     if not fetch and "live_state" not in st.session_state:
         st.sidebar.info(
             "Fetches live spot (Yahoo chart + Stooq failover), ^IRX/^TNX "
@@ -612,7 +612,7 @@ def render_vol_surface_tab(df: pd.DataFrame, meta, inputs: dict) -> None:
         charts.vol_smile_chart(
             smile_df, meta.spot,
             title=f"IV Smile · expiry {meta.expiry.strftime('%Y-%m-%d')}"),
-        width="stretch",
+        use_container_width=True,
     )
 
     surface_records = (st.session_state.get("live_surface")
@@ -622,7 +622,7 @@ def render_vol_surface_tab(df: pd.DataFrame, meta, inputs: dict) -> None:
         try:
             st.plotly_chart(
                 charts.vol_surface_chart(surface),
-                width="stretch",
+                use_container_width=True,
             )
         except Exception as exc:
             logger.exception("Vol surface chart failed")
@@ -648,11 +648,11 @@ def render_vol_surface_tab(df: pd.DataFrame, meta, inputs: dict) -> None:
     if ("call_market_mid" in df.columns
             and df["call_market_mid"].notna().any()):
         st.plotly_chart(
-            charts.bid_ask_premium_chart(df, meta), width="stretch")
+            charts.bid_ask_premium_chart(df, meta), use_container_width=True)
 
 
 def render_charts_tab(df: pd.DataFrame, meta) -> None:
-    st.plotly_chart(charts.premium_chart(df, meta), width="stretch")
+    st.plotly_chart(charts.premium_chart(df, meta), use_container_width=True)
     default_keys = ["delta", "gamma", "vega", "theta", "rho", "vanna",
                     "volga", "charm"]
     keys = st.multiselect(
@@ -663,7 +663,7 @@ def render_charts_tab(df: pd.DataFrame, meta) -> None:
         with cols[i % 2]:
             st.plotly_chart(charts.greek_chart(df, meta, key,
                                                DEFAULT_CONVENTIONS),
-                            width="stretch")
+                            use_container_width=True)
 
 
 def render_heatmap_tab(df: pd.DataFrame, meta) -> None:
@@ -677,7 +677,7 @@ def render_heatmap_tab(df: pd.DataFrame, meta) -> None:
     if keys:
         st.plotly_chart(charts.heatmap_chart(df, meta, keys, side,
                                              DEFAULT_CONVENTIONS),
-                        width="stretch")
+                        use_container_width=True)
 
 
 def render_model_tab(meta, mi: MarketInputs, inputs: dict) -> None:
@@ -838,7 +838,7 @@ def render_scenarios_tab(df: pd.DataFrame, inputs: dict) -> None:
     show["d_put"] = show["d_put"].map(lambda x: f"{x:+,.4f}")
     st.dataframe(show, height=520)
     st.plotly_chart(
-        charts.scenario_pnl_chart(scen), width="stretch",
+        charts.scenario_pnl_chart(scen), use_container_width=True,
     )
 
 
@@ -881,7 +881,7 @@ def main() -> None:
              "options use BSM with a dividend yield.")
 
     calculate = st.sidebar.button("CALCULATE OPTION CHAIN", type="primary",
-                                  width="stretch",
+                                  use_container_width=True,
                                   disabled=state is None)
 
     if state is None:
