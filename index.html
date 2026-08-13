@@ -58,6 +58,8 @@
         "pricing/volatility.py",
         "analytics/__init__.py",
         "analytics/chain.py",
+        "analytics/scenarios.py",
+        "analytics/vol_surface.py",
         "data/__init__.py",
         "data/base.py",
         "data/bsm_workbook.py",
@@ -76,7 +78,6 @@
         "visualization/charts.py",
         "visualization/option_chain.py",
         "pricing/models.py",
-        "analytics/scenarios.py",
       ];
       for (const path of pyFiles) {
         files[path] = { url: "./" + path };

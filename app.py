@@ -137,38 +137,110 @@ def sidebar_market_inputs() -> SidebarMarketState | None:
 def sidebar_live_inputs() -> SidebarMarketState | None:
     from data.live_provider import LiveMarketDataProvider
 
-    st.sidebar.subheader("Live underlier")
+    st.sidebar.subheader("Live underlier + options")
     underlying = st.sidebar.selectbox(
-        "Underlying", ["SPX", "ES"],
-        help="SPX uses ^GSPC spot + dividend proxy; ES uses ES=F futures "
-             "spot and Black-76 (q = r).")
+        "Underlying", ["SPX", "SPY", "ES"],
+        help="SPX/SPY: live spot + live option bid/ask from Yahoo. "
+             "ES: live ES=F spot; option surface uses SPX as an explicit "
+             "vol proxy (labeled in UI).")
     dte = st.sidebar.number_input(
-        "Target DTE (days) for synthetic expiry", min_value=1.0,
-        max_value=365.0, value=30.0, step=1.0)
-    fetch = st.sidebar.button("FETCH LIVE SNAPSHOT", type="secondary",
+        "Target DTE (days)", min_value=1.0,
+        max_value=730.0, value=30.0, step=1.0)
+    fetch_opts = st.sidebar.checkbox(
+        "Fetch live option chain (bid/ask)", value=True,
+        help="Real Yahoo option quotes via crumb session. Never fabricated.")
+    fetch_surf = st.sidebar.checkbox(
+        "Build multi-expiry vol surface", value=True,
+        help="Loads several listed expiries for the 3D IV surface.")
+    price_smile = st.sidebar.checkbox(
+        "Price chain on live market IV smile", value=True,
+        help="Uses per-strike IVs implied from live mids (or Yahoo IV "
+             "fallback). Strongest market alignment for European pricing.")
+    n_exp = st.sidebar.slider("Surface expiries", 2, 8, 5)
+    fetch = st.sidebar.button("FETCH LIVE MARKET", type="secondary",
                               width="stretch")
     if not fetch and "live_state" not in st.session_state:
         st.sidebar.info(
-            "Fetches live spot (^GSPC or ES=F), ^IRX rate and VIX vol proxy "
-            "via Yahoo chart API. Option bid/ask chains are not fabricated "
-            "when unavailable.")
+            "Fetches live spot (Yahoo chart + Stooq failover), ^IRX/^TNX "
+            "rate, VIX, and — when enabled — real option bid/ask chains "
+            "plus a volatility surface. Quotes are never invented.")
         return None
     if fetch or "live_state" in st.session_state:
-        try:
-            provider = LiveMarketDataProvider(
-                underlying=underlying, dte_days=float(dte))
-            mi = provider.get_market_inputs()
-        except DataProviderError as exc:
-            st.sidebar.error(str(exc))
-            return None
-        for note in provider.interpretations:
+        if fetch:
+            try:
+                with st.spinner("Fetching live market…"):
+                    provider = LiveMarketDataProvider(
+                        underlying=underlying,
+                        dte_days=float(dte),
+                        fetch_options=fetch_opts,
+                        fetch_surface=fetch_surf and fetch_opts,
+                        max_surface_expiries=int(n_exp),
+                    )
+                    mi = provider.get_market_inputs()
+            except DataProviderError as exc:
+                st.sidebar.error(str(exc))
+                return None
+
+            file_strikes = file_sigmas = None
+            use_file = False
+            market_table = provider.market_table()
+            if price_smile and market_table is not None:
+                smile = provider.smile_strikes_sigmas(
+                    mi.risk_free_rate, mi.dividend_yield)
+                if smile is not None:
+                    file_strikes, file_sigmas = smile
+                    use_file = True
+
+            surface_payload = None
+            if provider.surface_slices:
+                from analytics.vol_surface import build_surface_table
+                slices = [
+                    (c.expiry, c.spot, c.frame) for c in provider.surface_slices
+                ]
+                surface_df = build_surface_table(
+                    slices, mi.spot, mi.risk_free_rate, mi.dividend_yield,
+                    asof=mi.asof,
+                )
+                surface_payload = surface_df.to_dict(orient="list")
+
+            skew_payload = None
+            if market_table is not None:
+                from analytics.vol_surface import compute_skew_metrics
+                from utils.dates import DayCount, time_to_expiry
+                T_live = time_to_expiry(
+                    mi.expiry, now=mi.asof, convention=DayCount.ACT_365)
+                skew = compute_skew_metrics(
+                    market_table, mi.spot, max(T_live, 1e-6),
+                    mi.risk_free_rate, mi.dividend_yield, expiry=mi.expiry)
+                skew_payload = {
+                    "atm_iv": skew.atm_iv,
+                    "put_25d_iv": skew.put_25d_iv,
+                    "call_25d_iv": skew.call_25d_iv,
+                    "risk_reversal_25d": skew.risk_reversal_25d,
+                    "butterfly_25d": skew.butterfly_25d,
+                    "skew_slope": skew.skew_slope,
+                    "n_points": skew.n_points,
+                }
+
+            contract = {"SPX": "SPX", "SPY": "SPY", "ES": "ES"}.get(
+                underlying, underlying)
+            state = SidebarMarketState(
+                market_inputs=mi,
+                use_file_strikes=use_file,
+                file_strikes=file_strikes,
+                file_sigmas=file_sigmas,
+                contract=contract,
+                market_table=market_table,
+                interpretations=list(provider.interpretations),
+            )
+            st.session_state["live_state"] = state
+            st.session_state["live_surface"] = surface_payload
+            st.session_state["live_skew"] = skew_payload
+        else:
+            state = st.session_state["live_state"]
+
+        for note in (state.interpretations or []):
             st.sidebar.caption(f"ℹ️ {note}")
-        state = SidebarMarketState(
-            market_inputs=mi,
-            contract="ES Sep" if underlying == "ES" else "SPX",
-            interpretations=list(provider.interpretations),
-        )
-        st.session_state["live_state"] = state
         return state
     return None
 
@@ -470,6 +542,86 @@ def render_chain_tab(df: pd.DataFrame, meta, inputs: dict) -> None:
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 
+def render_vol_surface_tab(df: pd.DataFrame, meta, inputs: dict) -> None:
+    st.subheader("Volatility Surface & Skew")
+    st.caption(
+        "Surface and smile are built from **live or file market quotes** "
+        "(mid→IV, with Yahoo IV only as fallback). No fabricated vols."
+    )
+    skew = st.session_state.get("live_skew") or inputs.get("skew")
+    if skew:
+        c1, c2, c3, c4, c5 = st.columns(5)
+        c1.metric("ATM IV", "—" if skew.get("atm_iv") is None
+                  else f"{skew['atm_iv']*100:.2f}%")
+        c2.metric("25Δ Put IV", "—" if skew.get("put_25d_iv") is None
+                  else f"{skew['put_25d_iv']*100:.2f}%")
+        c3.metric("25Δ Call IV", "—" if skew.get("call_25d_iv") is None
+                  else f"{skew['call_25d_iv']*100:.2f}%")
+        c4.metric("25Δ RR", "—" if skew.get("risk_reversal_25d") is None
+                  else f"{skew['risk_reversal_25d']*100:+.2f} vol pts")
+        c5.metric("25Δ Fly", "—" if skew.get("butterfly_25d") is None
+                  else f"{skew['butterfly_25d']*100:+.2f} vol pts")
+
+    # Single-expiry smile from chain
+    smile_df = df.copy()
+    if "call_market_iv" in smile_df.columns or "put_market_iv" in smile_df.columns:
+        smile_df["call_iv"] = smile_df.get("call_market_iv")
+        smile_df["put_iv"] = smile_df.get("put_market_iv")
+        blend = []
+        for _, row in smile_df.iterrows():
+            c, p = row.get("call_iv"), row.get("put_iv")
+            if pd.notna(c) and pd.notna(p):
+                blend.append(0.5 * (c + p))
+            elif pd.notna(c):
+                blend.append(c)
+            elif pd.notna(p):
+                blend.append(p)
+            else:
+                blend.append(row.get("sigma"))
+        smile_df["market_iv"] = blend
+    elif "sigma" in smile_df.columns:
+        smile_df["market_iv"] = smile_df["sigma"]
+
+    st.plotly_chart(
+        charts.vol_smile_chart(
+            smile_df, meta.spot,
+            title=f"IV Smile · expiry {meta.expiry.strftime('%Y-%m-%d')}"),
+        width="stretch",
+    )
+
+    surface_records = (st.session_state.get("live_surface")
+                       or inputs.get("surface_records"))
+    if surface_records:
+        surface = pd.DataFrame(surface_records)
+        st.plotly_chart(
+            charts.vol_surface_chart(surface),
+            width="stretch",
+        )
+        st.dataframe(
+            surface[["expiry", "T", "strike", "moneyness", "market_iv"]]
+            .assign(
+                T_days=lambda x: x["T"] * 365.0,
+                market_iv_pct=lambda x: x["market_iv"] * 100.0,
+            )[["expiry", "T_days", "strike", "moneyness", "market_iv_pct"]]
+            .rename(columns={
+                "T_days": "T (days)",
+                "market_iv_pct": "IV %",
+            }),
+            height=320,
+        )
+    else:
+        st.info(
+            "Multi-expiry surface unavailable. Enable **Build multi-expiry "
+            "vol surface** in Live API and fetch again, or upload a file "
+            "with per-strike IVs for a single-expiry smile."
+        )
+
+    if ("call_market_mid" in df.columns
+            and df["call_market_mid"].notna().any()):
+        st.plotly_chart(
+            charts.bid_ask_premium_chart(df, meta), width="stretch")
+
+
 def render_charts_tab(df: pd.DataFrame, meta) -> None:
     st.plotly_chart(charts.premium_chart(df, meta), width="stretch")
     default_keys = ["delta", "gamma", "vega", "theta", "rho", "vanna",
@@ -767,6 +919,8 @@ def main() -> None:
             model_name=model.model.value,
             contract=state.contract,
             market_records=market_records,
+            surface_records=st.session_state.get("live_surface"),
+            skew=st.session_state.get("live_skew"),
         )
 
     if "calc" not in st.session_state:
@@ -821,7 +975,13 @@ def main() -> None:
         f"r = {p['r'] * 100:.2f}%, q_eff = {p['q'] * 100:.2f}% "
         f"\u00b7 strikes={meta.n_strikes}"
     )
-    if p.get("use_file_strikes"):
+    if p.get("use_file_strikes") and p.get("market_records"):
+        st.success(
+            "Live / file **market IV smile** active with **bid/ask mids** where "
+            f"available under **{p.get('model_label')}**. Mispricing and surface "
+            "tabs use real quotes — never fabricated."
+        )
+    elif p.get("use_file_strikes"):
         st.success(
             "Market inclination: chain priced with **per-strike market IVs** "
             f"under **{p.get('model_label')}**. BSM/Black premiums are the "
@@ -833,14 +993,16 @@ def main() -> None:
                    "values and Greeks are N/A (undefined at expiry).")
 
     render_kpis(meta, mi_calc, df)
-    (tab_chain, tab_market, tab_scen, tab_charts, tab_heat,
+    (tab_chain, tab_market, tab_vol, tab_scen, tab_charts, tab_heat,
      tab_model, tab_guide) = st.tabs(
-        ["Option Chain", "Market vs Model", "Scenarios", "Charts",
-         "Greek Heatmap", "Model Details", "Greek Guide"])
+        ["Option Chain", "Market vs Model", "Vol Surface", "Scenarios",
+         "Charts", "Greek Heatmap", "Model Details", "Greek Guide"])
     with tab_chain:
         render_chain_tab(df, meta, p)
     with tab_market:
         render_market_tab(df, p)
+    with tab_vol:
+        render_vol_surface_tab(df, meta, p)
     with tab_scen:
         render_scenarios_tab(df, p)
     with tab_charts:

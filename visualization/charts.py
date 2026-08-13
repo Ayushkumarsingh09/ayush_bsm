@@ -132,3 +132,120 @@ def heatmap_chart(df: pd.DataFrame, meta: ChainMeta, keys: list[str],
               "each Greek normalized by its own max |value|)",
         xaxis_title="Strike", **_LAYOUT)
     return fig
+
+
+def vol_smile_chart(df: pd.DataFrame, spot: float,
+                    title: str = "Implied Volatility Smile") -> go.Figure:
+    """Plot market / model IV vs strike for a single expiry."""
+    fig = go.Figure()
+    if "market_iv" in df.columns and df["market_iv"].notna().any():
+        fig.add_scatter(
+            x=df["strike"], y=df["market_iv"] * 100.0,
+            name="Market IV", mode="lines+markers",
+            line=dict(color=SPOT_COLOR, width=2),
+            marker=dict(size=5),
+        )
+    if "call_iv" in df.columns and df["call_iv"].notna().any():
+        fig.add_scatter(
+            x=df["strike"], y=df["call_iv"] * 100.0,
+            name="Call IV", mode="markers",
+            marker=dict(color=CALL_COLOR, size=6, symbol="circle-open"),
+        )
+    if "put_iv" in df.columns and df["put_iv"].notna().any():
+        fig.add_scatter(
+            x=df["strike"], y=df["put_iv"] * 100.0,
+            name="Put IV", mode="markers",
+            marker=dict(color=PUT_COLOR, size=6, symbol="diamond-open"),
+        )
+    if "sigma" in df.columns and df["sigma"].notna().any():
+        fig.add_scatter(
+            x=df["strike"], y=df["sigma"] * 100.0,
+            name="Pricing σ", mode="lines",
+            line=dict(color=ATM_COLOR, width=2, dash="dot"),
+        )
+    fig.add_vline(x=spot, line_dash="dot", line_color=SPOT_COLOR,
+                  annotation_text=f"Spot {spot:,.0f}")
+    fig.update_layout(
+        title=title,
+        xaxis_title="Strike",
+        yaxis_title="Implied Vol (%)",
+        **_LAYOUT,
+    )
+    return fig
+
+
+def vol_surface_chart(surface: pd.DataFrame,
+                      title: str = "Implied Volatility Surface") -> go.Figure:
+    """3D surface / mesh of IV vs strike and tenor from long-form points."""
+    if surface is None or surface.empty:
+        fig = go.Figure()
+        fig.update_layout(title="No surface points", **_LAYOUT)
+        return fig
+
+    # Pivot to grid for surface plot
+    s = surface.dropna(subset=["strike", "T", "market_iv"]).copy()
+    s["T_days"] = s["T"] * 365.0
+    strikes = np.sort(s["strike"].unique())
+    tenors = np.sort(s["T"].unique())
+    # Build Z via nearest-neighbour on (K,T) scatter for a regular grid
+    k_grid = np.linspace(strikes.min(), strikes.max(), min(60, len(strikes)))
+    t_grid = tenors
+    Z = np.full((len(t_grid), len(k_grid)), np.nan)
+    for i, t in enumerate(t_grid):
+        slice_ = s[np.isclose(s["T"], t, atol=1e-8)]
+        if slice_.empty:
+            continue
+        order = np.argsort(slice_["strike"].to_numpy())
+        Z[i, :] = np.interp(
+            k_grid,
+            slice_["strike"].to_numpy()[order],
+            slice_["market_iv"].to_numpy()[order] * 100.0,
+        )
+    fig = go.Figure(data=[go.Surface(
+        x=k_grid, y=t_grid * 365.0, z=Z,
+        colorscale="Viridis",
+        colorbar=dict(title="IV %"),
+        hovertemplate=("K=%{x:,.0f}<br>T=%{y:.1f}d<br>IV=%{z:.2f}%"
+                       "<extra></extra>"),
+    )])
+    fig.update_layout(
+        title=title,
+        scene=dict(
+            xaxis_title="Strike",
+            yaxis_title="Tenor (days)",
+            zaxis_title="IV (%)",
+            bgcolor="rgba(17,20,24,1)",
+        ),
+        **{k: v for k, v in _LAYOUT.items() if k != "hovermode"},
+        margin=dict(l=10, r=10, t=48, b=10),
+    )
+    return fig
+
+
+def bid_ask_premium_chart(df: pd.DataFrame, meta: ChainMeta) -> go.Figure:
+    """Overlay market mid vs BSM premium when quotes exist."""
+    fig = go.Figure()
+    fig.add_scatter(x=df["strike"], y=df["call_bsm_premium"],
+                    name="Call BSM", line=dict(color=CALL_COLOR, width=2))
+    fig.add_scatter(x=df["strike"], y=df["put_bsm_premium"],
+                    name="Put BSM", line=dict(color=PUT_COLOR, width=2))
+    if "call_market_mid" in df.columns and df["call_market_mid"].notna().any():
+        fig.add_scatter(
+            x=df["strike"], y=df["call_market_mid"],
+            name="Call Mid", mode="markers",
+            marker=dict(color=CALL_COLOR, size=6, symbol="x"),
+        )
+    if "put_market_mid" in df.columns and df["put_market_mid"].notna().any():
+        fig.add_scatter(
+            x=df["strike"], y=df["put_market_mid"],
+            name="Put Mid", mode="markers",
+            marker=dict(color=PUT_COLOR, size=6, symbol="x"),
+        )
+    _add_markers(fig, meta)
+    fig.update_layout(
+        title="Market Mid vs BSM Premium",
+        xaxis_title="Strike",
+        yaxis_title="Premium (index points)",
+        **_LAYOUT,
+    )
+    return fig

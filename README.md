@@ -28,15 +28,17 @@ fully capture. This is an analytics tool — not trading advice.
 | Area | Capability |
 |---|---|
 | Pricing | BSM (equity index) and **Black-76** (futures, `q = r`) with auto-detect for ES |
-| Inputs | Manual · CSV/Excel flat tables · **BSM chain workbooks** · Live spot/rate/VIX |
-| Chain | Configurable strike grid (default 28+ATM+28 = **57**) or **file strikes + smile** |
+| Inputs | Manual · CSV/Excel · BSM workbooks · **Live spot + live option bid/ask** |
+| Live data | Yahoo chart (query1/query2) + Stooq failover · crumb-auth option chains for **^SPX / SPY** |
+| Chain | Strike grid or **live/file market IV smile** (per-strike) |
 | Premiums | Explicit **BSM Premium** columns (never confused with market quotes) |
 | Greeks | Delta, Vega, Theta, Rho, Gamma, Vanna, Volga, Charm, Speed, Zomma, Color, Ultima |
-| Market | Market vs Model tab · mispricing when mid/bid/ask present · IV round-trip |
+| Market | Market vs Model · mispricing vs **real mids** · IV round-trip |
+| Vol surface | Multi-expiry **IV surface**, smile chart, 25Δ RR / fly / ATM skew |
 | Risk | Scenario shocks (spot / vol / rate / time) |
-| Viz | Plotly premium & Greek charts · normalized Greek heatmap |
+| Viz | Plotly premiums, Greeks, heatmap, smile, 3D surface |
 | Export | CSV/Excel with inputs, conventions and model metadata |
-| Quality | **739** automated tests including finite-difference Greek validation |
+| Quality | **745+** automated tests including finite-difference Greek validation |
 
 ---
 
@@ -149,9 +151,12 @@ Samples: `sample_data/sample.csv`, `sample_data/BSM inputs.xlsx`,
 
 ### Live API
 
-Fetches **^GSPC** or **ES=F** spot, **^IRX** rate, and **VIX** via the public
-Yahoo chart API. Live option bid/ask chains are **never fabricated** when
-unavailable.
+Fetches **live spot** (^GSPC / SPY / ES=F) via Yahoo chart with Stooq failover,
+**^IRX** (with ^TNX fallback) for rates, and **VIX**. When enabled, also
+fetches **real option bid/ask** for **^SPX** / **SPY** via Yahoo crumb session,
+builds a **multi-expiry IV surface**, 25Δ skew metrics, and can price the chain
+on the live market IV smile. ES uses live futures spot with an explicit SPX
+options vol-surface proxy (labeled in the UI). Quotes are **never fabricated**.
 
 ---
 
@@ -163,12 +168,12 @@ ayush_bsm/
 ├── index.html                  # GitHub Pages + stlite host
 ├── config/settings.py          # defaults and numerical guards
 ├── pricing/                    # BSM core, Greeks, conventions, Black-76 model
-├── analytics/                  # strike chain + scenarios
-├── data/                       # manual, CSV/Excel, workbook, live, market quotes
+├── analytics/                  # strike chain, scenarios, vol surface / skew
+├── data/                       # manual, CSV/Excel, workbook, live options, market quotes
 ├── validation/                 # human-readable validators
-├── visualization/              # option chain styling + Plotly charts
+├── visualization/              # option chain styling + Plotly charts / surface
 ├── utils/                      # dates, export, formatting
-├── tests/                      # 739 tests (FD Greeks, workbook, market layer)
+├── tests/                      # 745+ tests (FD Greeks, workbook, live, surface)
 ├── sample_data/                # example CSV / Excel
 └── scripts/run_excel_file.py   # CLI runner
 ```
@@ -192,9 +197,9 @@ snapshot smoke tests (skipped if offline), and presentation/export labels.
 
 | Mode | Meaning |
 |---|---|
-| Market IVs in file | Premiums are **market-implied European fair values** under BSM/Black-76 |
-| Live spot / IRX / VIX | Macro inputs inclined to live markets |
-| Mid/bid/ask columns | Enables **Mispricing = BSM Premium − Market Mid** |
+| Market IVs in file / live smile | Premiums are **market-implied European fair values** under BSM/Black-76 |
+| Live spot / IRX / VIX | Multi-source macro inputs |
+| Live option bid/ask (^SPX/SPY) | Real mids → mispricing, smile, surface, 25Δ skew |
 | Path prediction | **Not** what this model does — no crystal-ball claims |
 
 ---
