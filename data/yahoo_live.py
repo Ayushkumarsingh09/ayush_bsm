@@ -44,8 +44,36 @@ _CACHE: dict[str, Any] | None = None
 
 
 def _is_browser() -> bool:
-    """True under Pyodide / stlite (Emscripten)."""
-    return sys.platform == "emscripten"
+    """True under Pyodide / stlite (Emscripten) or when ``js`` is available."""
+    if sys.platform in {"emscripten", "wasm32", "wasi"}:
+        return True
+    if "pyodide" in sys.modules:
+        return True
+    try:
+        import js  # type: ignore  # noqa: F401  # present in Pyodide
+        return True
+    except ImportError:
+        pass
+    # stlite sometimes reports platform oddly — detect via user agent bridge
+    try:
+        from js import navigator  # type: ignore
+        _ = navigator.userAgent
+        return True
+    except Exception:
+        return False
+
+
+def _network_exception(exc: BaseException) -> bool:
+    """True if this looks like a browser CORS / network failure."""
+    name = type(exc).__name__
+    msg = str(exc).lower()
+    if name in {"JsException", "OSError", "URLError", "NetworkError"}:
+        return True
+    needles = (
+        "networkerror", "failed to fetch", "failed to load",
+        "cors", "xmlhttprequest", "err_failed", "connection",
+    )
+    return any(n in msg for n in needles)
 
 
 def _parse_asof(text: str | None) -> datetime:
@@ -276,8 +304,7 @@ def _chart_last(symbol: str, timeout: float = 15.0) -> tuple[float, datetime, st
         url = host + urllib.parse.quote(symbol) + "?range=5d&interval=1d"
         try:
             payload = _http_json(url, timeout=timeout)
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError,
-                urllib.error.HTTPError) as exc:
+        except Exception as exc:
             errors.append(f"{host}: {exc}")
             continue
         result = (payload.get("chart") or {}).get("result") or []
@@ -293,7 +320,7 @@ def _chart_last(symbol: str, timeout: float = 15.0) -> tuple[float, datetime, st
             continue
         ts = meta.get("regularMarketTime")
         asof = (datetime.fromtimestamp(ts, tz=timezone.utc).replace(tzinfo=None)
-                if ts else datetime.utcnow())
+                if ts else datetime.now(timezone.utc).replace(tzinfo=None))
         return float(price), asof, host.split("//")[1].split("/")[0]
     raise RuntimeError(f"Live chart failed for {symbol}: {'; '.join(errors)}")
 
@@ -338,7 +365,7 @@ def _spot_with_failover(symbol: str, timeout: float = 15.0
         px, asof, host = _chart_last(symbol, timeout=timeout)
         used.append(f"yahoo-chart:{host}")
         return px, asof, tuple(used)
-    except RuntimeError as primary:
+    except Exception as primary:
         logger.warning("Yahoo chart failed for %s: %s", symbol, primary)
         try:
             px, asof = _stooq_last(symbol, timeout=timeout)
@@ -358,17 +385,24 @@ def fetch_live_snapshot(underlying: str = "SPX",
     Under Pyodide / GitHub Pages, Yahoo is blocked by CORS — uses the
     deployed ``live_cache.json`` instead (still real Yahoo data, cached).
     """
+    # Prefer cache in-browser so we never trip CORS / JsException.
     if _is_browser():
         return _snapshot_from_cache(underlying)
 
     try:
         return _fetch_live_snapshot_network(underlying, timeout=timeout)
-    except RuntimeError as exc:
+    except Exception as exc:
         logger.warning("Live network snapshot failed (%s); trying cache", exc)
         try:
             return _snapshot_from_cache(underlying)
-        except RuntimeError:
-            raise exc from None
+        except Exception:
+            if _network_exception(exc):
+                raise RuntimeError(
+                    "Yahoo is blocked in this environment (browser CORS) and "
+                    "the live cache could not be loaded. Hard-refresh the "
+                    "page or run locally: streamlit run app.py"
+                ) from exc
+            raise RuntimeError(str(exc)) from exc
 
 
 def _fetch_live_snapshot_network(underlying: str = "SPX",
@@ -524,7 +558,7 @@ def fetch_option_chain(
         logger.warning("Live option fetch failed (%s); trying cache", exc)
         try:
             return _chain_from_cache(underlying)
-        except RuntimeError:
+        except Exception:
             raise RuntimeError(str(exc)) from exc
 
 

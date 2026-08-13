@@ -110,8 +110,10 @@
       ];
 
       const files = {};
+      // Cache-bust so GitHub Pages / browsers don't keep stale .py modules.
+      const assetVersion = "20260814c";
       for (const path of pyFiles) {
-        files[path] = { url: "./" + path };
+        files[path] = { url: "./" + path + "?v=" + assetVersion };
       }
 
       // numpy/scipy/pandas are Pyodide-native (fast). plotly + openpyxl via micropip.

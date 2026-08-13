@@ -49,11 +49,22 @@ class LiveMarketDataProvider(DataProvider):
         self.surface_slices = []
         try:
             snap = fetch_live_snapshot(self._underlying)
-        except RuntimeError as exc:
-            raise DataProviderError(
-                f"Live data fetch failed: {exc}. Check network access, "
-                "or use Manual / CSV."
-            ) from exc
+        except Exception as exc:
+            # Last resort: try cache even if yahoo_live raised a non-RuntimeError
+            # (Pyodide JsException from CORS).
+            try:
+                from data.yahoo_live import _snapshot_from_cache
+                snap = _snapshot_from_cache(self._underlying)
+                self.interpretations.append(
+                    f"Direct live fetch failed ({type(exc).__name__}); "
+                    "using Pages live-cache."
+                )
+            except Exception:
+                raise DataProviderError(
+                    f"Live data fetch failed: {exc}. On GitHub Pages, Yahoo is "
+                    "blocked by browser CORS — ensure sample_data/live_cache.json "
+                    "is loaded (hard-refresh). Or run locally: streamlit run app.py"
+                ) from exc
         self.snapshot = snap
 
         if snap.risk_free_rate is None:
