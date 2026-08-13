@@ -1,0 +1,10 @@
+numpy>=2.1
+scipy>=1.14
+pandas>=2.2
+plotly>=5.24
+streamlit>=1.40
+pytest>=8.3
+XlsxWriter>=3.2
+openpyxl>=3.1
+# Live underlier/rate/VIX uses the public Yahoo chart HTTP API (stdlib urllib).
+# yfinance is optional and not required.
