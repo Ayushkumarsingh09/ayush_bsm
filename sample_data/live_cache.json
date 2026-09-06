@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-06 15:20:02Z",
+  "generated_at": "2026-09-06 20:17:37Z",
   "note": "Cached live Yahoo snapshot for GitHub Pages / stlite. Browsers cannot call Yahoo directly (CORS). Local Streamlit still fetches live.",
   "snapshots": {
     "SPX": {
