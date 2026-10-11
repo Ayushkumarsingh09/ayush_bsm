@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-11 05:23:46Z",
+  "generated_at": "2026-10-11 12:34:03Z",
   "note": "Cached live Yahoo snapshot for GitHub Pages / stlite. Browsers cannot call Yahoo directly (CORS). Local Streamlit still fetches live.",
   "snapshots": {
     "SPX": {
@@ -75,17 +75,6 @@
           "put_ask": 9.4,
           "put_last": 12.1,
           "put_yahoo_iv": 0.2246934221
-        },
-        {
-          "strike": 7050.0,
-          "call_bid": null,
-          "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
-          "put_bid": 12.3,
-          "put_ask": 13.0,
-          "put_last": 13.95,
-          "put_yahoo_iv": 0.2277680373
         },
         {
           "strike": 7075.0,
@@ -297,17 +286,6 @@
           "put_yahoo_iv": 0.1377611554
         },
         {
-          "strike": 7675.0,
-          "call_bid": 196.1,
-          "call_ask": 200.5,
-          "call_last": 218.55,
-          "call_yahoo_iv": 0.1333437802,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
-        },
-        {
           "strike": 7700.0,
           "call_bid": null,
           "call_ask": null,
@@ -328,39 +306,6 @@
           "put_ask": 71.2,
           "put_last": 71.2,
           "put_yahoo_iv": 0.120778293
-        },
-        {
-          "strike": 7750.0,
-          "call_bid": null,
-          "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
-          "put_bid": 96.0,
-          "put_ask": 97.6,
-          "put_last": 105.02,
-          "put_yahoo_iv": 0.1393118144
-        },
-        {
-          "strike": 7775.0,
-          "call_bid": 129.6,
-          "call_ask": 132.3,
-          "call_last": 122.3,
-          "call_yahoo_iv": 0.1247817778,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
-        },
-        {
-          "strike": 7790.0,
-          "call_bid": 120.6,
-          "call_ask": 122.1,
-          "call_last": 116.16,
-          "call_yahoo_iv": 0.1223537473,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
         },
         {
           "strike": 7800.0,
@@ -385,17 +330,6 @@
           "put_yahoo_iv": 0.1068891192
         },
         {
-          "strike": 7830.0,
-          "call_bid": 98.1,
-          "call_ask": 99.7,
-          "call_last": 113.93,
-          "call_yahoo_iv": 0.1194965676,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
-        },
-        {
           "strike": 7850.0,
           "call_bid": 102.6,
           "call_ask": 104.6,
@@ -412,10 +346,10 @@
           "call_ask": 91.2,
           "call_last": 86.77,
           "call_yahoo_iv": 0.1318751364,
-          "put_bid": 149.4,
-          "put_ask": 154.0,
-          "put_last": 143.7,
-          "put_yahoo_iv": 0.1312094784
+          "put_bid": null,
+          "put_ask": null,
+          "put_last": null,
+          "put_yahoo_iv": null
         },
         {
           "strike": 7900.0,
@@ -423,10 +357,10 @@
           "call_ask": 78.8,
           "call_last": 75.6,
           "call_yahoo_iv": 0.1289378489,
-          "put_bid": 163.6,
-          "put_ask": 168.0,
-          "put_last": 142.41,
-          "put_yahoo_iv": 0.1298609964
+          "put_bid": null,
+          "put_ask": null,
+          "put_last": null,
+          "put_yahoo_iv": null
         },
         {
           "strike": 7925.0,
@@ -434,17 +368,6 @@
           "call_ask": 67.5,
           "call_last": 69.62,
           "call_yahoo_iv": 0.126206553,
-          "put_bid": 178.9,
-          "put_ask": 183.0,
-          "put_last": 160.0,
-          "put_yahoo_iv": 0.1286918034
-        },
-        {
-          "strike": 7950.0,
-          "call_bid": 46.8,
-          "call_ask": 48.3,
-          "call_last": 51.07,
-          "call_yahoo_iv": 0.1124775948,
           "put_bid": null,
           "put_ask": null,
           "put_last": null,
@@ -473,17 +396,6 @@
           "put_yahoo_iv": null
         },
         {
-          "strike": 8025.0,
-          "call_bid": 26.8,
-          "call_ask": 28.0,
-          "call_last": 36.25,
-          "call_yahoo_iv": 0.1094125162,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
-        },
-        {
           "strike": 8100.0,
           "call_bid": 17.3,
           "call_ask": 18.5,
@@ -500,17 +412,6 @@
           "call_ask": 7.9,
           "call_last": 5.9,
           "call_yahoo_iv": 0.1120236504,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
-        },
-        {
-          "strike": 8400.0,
-          "call_bid": null,
-          "call_ask": 1.5,
-          "call_last": 1.17,
-          "call_yahoo_iv": 0.1154721022,
           "put_bid": null,
           "put_ask": null,
           "put_last": null,
@@ -541,8 +442,8 @@
           "strike": 695.0,
           "call_bid": null,
           "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
+          "call_last": 82.23,
+          "call_yahoo_iv": 0.0,
           "put_bid": 1.04,
           "put_ask": 1.06,
           "put_last": 1.06,
@@ -585,8 +486,8 @@
           "strike": 715.0,
           "call_bid": null,
           "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
+          "call_last": 62.93,
+          "call_yahoo_iv": 0.0,
           "put_bid": 1.57,
           "put_ask": 1.59,
           "put_last": 1.57,
@@ -607,8 +508,8 @@
           "strike": 717.0,
           "call_bid": null,
           "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
+          "call_last": 62.1,
+          "call_yahoo_iv": 0.0,
           "put_bid": 1.64,
           "put_ask": 1.66,
           "put_last": 1.71,
@@ -717,8 +618,8 @@
           "strike": 727.0,
           "call_bid": null,
           "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
+          "call_last": 56.13,
+          "call_yahoo_iv": 0.0,
           "put_bid": 2.09,
           "put_ask": 2.11,
           "put_last": 2.17,
@@ -794,8 +695,8 @@
           "strike": 734.0,
           "call_bid": null,
           "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
+          "call_last": 52.53,
+          "call_yahoo_iv": 0.0,
           "put_bid": 2.52,
           "put_ask": 2.54,
           "put_last": 2.61,
@@ -871,8 +772,8 @@
           "strike": 741.0,
           "call_bid": null,
           "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
+          "call_last": 45.86,
+          "call_yahoo_iv": 0.0,
           "put_bid": 3.07,
           "put_ask": 3.09,
           "put_last": 3.07,
@@ -882,8 +783,8 @@
           "strike": 742.0,
           "call_bid": null,
           "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
+          "call_last": 40.33,
+          "call_yahoo_iv": 0.0,
           "put_bid": 3.16,
           "put_ask": 3.18,
           "put_last": 3.17,
@@ -904,8 +805,8 @@
           "strike": 744.0,
           "call_bid": null,
           "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
+          "call_last": 43.43,
+          "call_yahoo_iv": 0.0,
           "put_bid": 3.35,
           "put_ask": 3.37,
           "put_last": 3.4,
@@ -1003,8 +904,8 @@
           "strike": 753.0,
           "call_bid": null,
           "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
+          "call_last": 28.72,
+          "call_yahoo_iv": 0.0,
           "put_bid": 4.41,
           "put_ask": 4.43,
           "put_last": 4.57,
@@ -1058,8 +959,8 @@
           "strike": 758.0,
           "call_bid": null,
           "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
+          "call_last": 28.56,
+          "call_yahoo_iv": 0.0,
           "put_bid": 5.18,
           "put_ask": 5.2,
           "put_last": 5.23,
@@ -1801,6 +1702,17 @@
           "put_ask": null,
           "put_last": null,
           "put_yahoo_iv": null
+        },
+        {
+          "strike": 870.0,
+          "call_bid": null,
+          "call_ask": null,
+          "call_last": 0.05,
+          "call_yahoo_iv": 0.0,
+          "put_bid": null,
+          "put_ask": null,
+          "put_last": null,
+          "put_yahoo_iv": null
         }
       ]
     },
@@ -1833,17 +1745,6 @@
           "put_ask": 9.4,
           "put_last": 12.1,
           "put_yahoo_iv": 0.2246934221
-        },
-        {
-          "strike": 7050.0,
-          "call_bid": null,
-          "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
-          "put_bid": 12.3,
-          "put_ask": 13.0,
-          "put_last": 13.95,
-          "put_yahoo_iv": 0.2277680373
         },
         {
           "strike": 7075.0,
@@ -2055,17 +1956,6 @@
           "put_yahoo_iv": 0.1377611554
         },
         {
-          "strike": 7675.0,
-          "call_bid": 196.1,
-          "call_ask": 200.5,
-          "call_last": 218.55,
-          "call_yahoo_iv": 0.1333437802,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
-        },
-        {
           "strike": 7700.0,
           "call_bid": null,
           "call_ask": null,
@@ -2086,39 +1976,6 @@
           "put_ask": 71.2,
           "put_last": 71.2,
           "put_yahoo_iv": 0.120778293
-        },
-        {
-          "strike": 7750.0,
-          "call_bid": null,
-          "call_ask": null,
-          "call_last": null,
-          "call_yahoo_iv": null,
-          "put_bid": 96.0,
-          "put_ask": 97.6,
-          "put_last": 105.02,
-          "put_yahoo_iv": 0.1393118144
-        },
-        {
-          "strike": 7775.0,
-          "call_bid": 129.6,
-          "call_ask": 132.3,
-          "call_last": 122.3,
-          "call_yahoo_iv": 0.1247817778,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
-        },
-        {
-          "strike": 7790.0,
-          "call_bid": 120.6,
-          "call_ask": 122.1,
-          "call_last": 116.16,
-          "call_yahoo_iv": 0.1223537473,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
         },
         {
           "strike": 7800.0,
@@ -2143,17 +2000,6 @@
           "put_yahoo_iv": 0.1068891192
         },
         {
-          "strike": 7830.0,
-          "call_bid": 98.1,
-          "call_ask": 99.7,
-          "call_last": 113.93,
-          "call_yahoo_iv": 0.1194965676,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
-        },
-        {
           "strike": 7850.0,
           "call_bid": 102.6,
           "call_ask": 104.6,
@@ -2170,10 +2016,10 @@
           "call_ask": 91.2,
           "call_last": 86.77,
           "call_yahoo_iv": 0.1318751364,
-          "put_bid": 149.4,
-          "put_ask": 154.0,
-          "put_last": 143.7,
-          "put_yahoo_iv": 0.1312094784
+          "put_bid": null,
+          "put_ask": null,
+          "put_last": null,
+          "put_yahoo_iv": null
         },
         {
           "strike": 7900.0,
@@ -2181,10 +2027,10 @@
           "call_ask": 78.8,
           "call_last": 75.6,
           "call_yahoo_iv": 0.1289378489,
-          "put_bid": 163.6,
-          "put_ask": 168.0,
-          "put_last": 142.41,
-          "put_yahoo_iv": 0.1298609964
+          "put_bid": null,
+          "put_ask": null,
+          "put_last": null,
+          "put_yahoo_iv": null
         },
         {
           "strike": 7925.0,
@@ -2192,17 +2038,6 @@
           "call_ask": 67.5,
           "call_last": 69.62,
           "call_yahoo_iv": 0.126206553,
-          "put_bid": 178.9,
-          "put_ask": 183.0,
-          "put_last": 160.0,
-          "put_yahoo_iv": 0.1286918034
-        },
-        {
-          "strike": 7950.0,
-          "call_bid": 46.8,
-          "call_ask": 48.3,
-          "call_last": 51.07,
-          "call_yahoo_iv": 0.1124775948,
           "put_bid": null,
           "put_ask": null,
           "put_last": null,
@@ -2231,17 +2066,6 @@
           "put_yahoo_iv": null
         },
         {
-          "strike": 8025.0,
-          "call_bid": 26.8,
-          "call_ask": 28.0,
-          "call_last": 36.25,
-          "call_yahoo_iv": 0.1094125162,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
-        },
-        {
           "strike": 8100.0,
           "call_bid": 17.3,
           "call_ask": 18.5,
@@ -2258,17 +2082,6 @@
           "call_ask": 7.9,
           "call_last": 5.9,
           "call_yahoo_iv": 0.1120236504,
-          "put_bid": null,
-          "put_ask": null,
-          "put_last": null,
-          "put_yahoo_iv": null
-        },
-        {
-          "strike": 8400.0,
-          "call_bid": null,
-          "call_ask": 1.5,
-          "call_last": 1.17,
-          "call_yahoo_iv": 0.1154721022,
           "put_bid": null,
           "put_ask": null,
           "put_last": null,
@@ -5466,8 +5279,8 @@
           },
           {
             "strike": 7220.0,
-            "call_bid": 470.6,
-            "call_ask": 478.6,
+            "call_bid": 568.3,
+            "call_ask": 589.5,
             "call_last": 665.89,
             "call_yahoo_iv": 1e-05,
             "put_bid": 0.65,
@@ -5521,8 +5334,8 @@
           },
           {
             "strike": 7245.0,
-            "call_bid": 551.9,
-            "call_ask": 552.9,
+            "call_bid": 556.2,
+            "call_ask": 560.2,
             "call_last": 516.12,
             "call_yahoo_iv": 1e-05,
             "put_bid": 0.85,
@@ -7175,10 +6988,10 @@
             "call_ask": 1.4,
             "call_last": 1.15,
             "call_yahoo_iv": 0.0998930344,
-            "put_bid": 214.7,
-            "put_ask": 215.5,
+            "put_bid": null,
+            "put_ask": null,
             "put_last": 173.08,
-            "put_yahoo_iv": 0.2413100772
+            "put_yahoo_iv": 0.0
           },
           {
             "strike": 8000.0,
@@ -7208,10 +7021,10 @@
             "call_ask": 0.85,
             "call_last": 0.65,
             "call_yahoo_iv": 0.0979704462,
-            "put_bid": 215.6,
-            "put_ask": 216.9,
+            "put_bid": 222.3,
+            "put_ask": 243.2,
             "put_last": 268.4,
-            "put_yahoo_iv": 0.2033465897
+            "put_yahoo_iv": 0.2928079753
           },
           {
             "strike": 8015.0,
@@ -7274,10 +7087,10 @@
             "call_ask": 0.6,
             "call_last": 0.35,
             "call_yahoo_iv": 0.1046232117,
-            "put_bid": 396.8,
-            "put_ask": 400.1,
+            "put_bid": 319.7,
+            "put_ask": 321.9,
             "put_last": 329.9,
-            "put_yahoo_iv": 0.6636233589
+            "put_yahoo_iv": 0.4583107758
           },
           {
             "strike": 8045.0,
@@ -7351,10 +7164,10 @@
             "call_ask": 0.4,
             "call_last": 0.25,
             "call_yahoo_iv": 0.1118252881,
-            "put_bid": 278.8,
-            "put_ask": 279.7,
+            "put_bid": 285.9,
+            "put_ask": 287.2,
             "put_last": 374.0,
-            "put_yahoo_iv": 0.2343826562
+            "put_yahoo_iv": 0.2659375165
           },
           {
             "strike": 8080.0,
@@ -7384,10 +7197,10 @@
             "call_ask": 0.35,
             "call_last": 0.25,
             "call_yahoo_iv": 0.1152432227,
-            "put_bid": 290.8,
-            "put_ask": 298.4,
+            "put_bid": 299.8,
+            "put_ask": 301.1,
             "put_last": 393.2,
-            "put_yahoo_iv": 0.2596891048
+            "put_yahoo_iv": 0.2709728665
           },
           {
             "strike": 8095.0,
@@ -7450,10 +7263,10 @@
             "call_ask": 0.3,
             "call_last": 0.2,
             "call_yahoo_iv": 0.1235439209,
-            "put_bid": 427.8,
-            "put_ask": 448.2,
+            "put_bid": 322.4,
+            "put_ask": 343.5,
             "put_last": 345.74,
-            "put_yahoo_iv": 0.6251334484
+            "put_yahoo_iv": 0.33796591
           },
           {
             "strike": 8125.0,
@@ -7461,10 +7274,10 @@
             "call_ask": 0.3,
             "call_last": 0.17,
             "call_yahoo_iv": 0.1252528882,
-            "put_bid": 325.7,
-            "put_ask": 333.2,
+            "put_bid": 332.3,
+            "put_ask": 333.7,
             "put_last": 422.25,
-            "put_yahoo_iv": 0.2798686516
+            "put_yahoo_iv": 0.2820964125
           },
           {
             "strike": 8130.0,
@@ -7538,10 +7351,10 @@
             "call_ask": 0.25,
             "call_last": 0.2,
             "call_yahoo_iv": 0.1344080701,
-            "put_bid": 510.2,
-            "put_ask": 513.9,
+            "put_bid": 416.7,
+            "put_ask": 440.2,
             "put_last": 416.38,
-            "put_yahoo_iv": 0.75168095
+            "put_yahoo_iv": 0.5137682901
           },
           {
             "strike": 8170.0,
@@ -7549,10 +7362,10 @@
             "call_ask": 0.3,
             "call_last": 0.2,
             "call_yahoo_iv": 0.1406335938,
-            "put_bid": 478.3,
-            "put_ask": 497.9,
+            "put_bid": 370.4,
+            "put_ask": 391.6,
             "put_last": 381.43,
-            "put_yahoo_iv": 0.6661639219
+            "put_yahoo_iv": 0.3629977031
           },
           {
             "strike": 8175.0,
@@ -7560,10 +7373,10 @@
             "call_ask": 0.25,
             "call_last": 0.15,
             "call_yahoo_iv": 0.1394129028,
-            "put_bid": 375.5,
-            "put_ask": 383.0,
+            "put_bid": 379.5,
+            "put_ask": 384.1,
             "put_last": 465.53,
-            "put_yahoo_iv": 0.3081047584
+            "put_yahoo_iv": 0.3132698068
           },
           {
             "strike": 8180.0,
@@ -7626,10 +7439,10 @@
             "call_ask": 0.2,
             "call_last": 0.15,
             "call_yahoo_iv": 0.1522301575,
-            "put_bid": 425.0,
-            "put_ask": 432.7,
+            "put_bid": 428.5,
+            "put_ask": 433.0,
             "put_last": 512.68,
-            "put_yahoo_iv": 0.3348607774
+            "put_yahoo_iv": 0.3363637531
           },
           {
             "strike": 8230.0,
@@ -7637,10 +7450,10 @@
             "call_ask": 0.2,
             "call_last": 0.15,
             "call_yahoo_iv": 0.1538170557,
-            "put_bid": 410.6,
-            "put_ask": 492.0,
+            "put_bid": 433.4,
+            "put_ask": 437.6,
             "put_last": 532.06,
-            "put_yahoo_iv": 0.543972761
+            "put_yahoo_iv": 0.3371343143
           },
           {
             "strike": 8240.0,
@@ -7681,10 +7494,10 @@
             "call_ask": 0.2,
             "call_last": 0.1,
             "call_yahoo_iv": 0.1665122412,
-            "put_bid": 470.6,
-            "put_ask": 477.7,
+            "put_bid": 472.8,
+            "put_ask": 477.0,
             "put_last": 552.12,
-            "put_yahoo_iv": 0.3595797685
+            "put_yahoo_iv": 0.3558871785
           },
           {
             "strike": 8275.0,
@@ -7736,10 +7549,10 @@
             "call_ask": 0.2,
             "call_last": 0.25,
             "call_yahoo_iv": 0.1790853577,
-            "put_bid": 509.8,
-            "put_ask": 517.5,
+            "put_bid": 512.1,
+            "put_ask": 516.6,
             "put_last": 592.33,
-            "put_yahoo_iv": 0.3799958241
+            "put_yahoo_iv": 0.3750520259
           },
           {
             "strike": 8320.0,
@@ -7769,10 +7582,10 @@
             "call_ask": 0.2,
             "call_last": 0.22,
             "call_yahoo_iv": 0.1853108813,
-            "put_bid": 529.7,
-            "put_ask": 537.5,
+            "put_bid": 527.5,
+            "put_ask": 545.6,
             "put_last": 610.5,
-            "put_yahoo_iv": 0.3905853178
+            "put_yahoo_iv": 0.4318904468
           },
           {
             "strike": 8340.0,
@@ -7813,10 +7626,10 @@
             "call_ask": 0.2,
             "call_last": 0.1,
             "call_yahoo_iv": 0.1976398596,
-            "put_bid": 569.8,
-            "put_ask": 577.5,
+            "put_bid": 567.2,
+            "put_ask": 585.3,
             "put_last": 648.5,
-            "put_yahoo_iv": 0.4114743912
+            "put_yahoo_iv": 0.4525430112
           },
           {
             "strike": 8375.0,
@@ -7890,10 +7703,10 @@
             "call_ask": 0.2,
             "call_last": 0.2,
             "call_yahoo_iv": 0.2143633252,
-            "put_bid": 852.3,
-            "put_ask": 863.9,
+            "put_bid": 885.0,
+            "put_ask": 892.8,
             "put_last": 777.0,
-            "put_yahoo_iv": 1.1858294188
+            "put_yahoo_iv": 1.2694013886
           },
           {
             "strike": 8430.0,
@@ -8977,8 +8790,8 @@
             "strike": 720.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 53.42,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.04,
             "put_ask": 0.05,
             "put_last": 0.05,
@@ -8988,8 +8801,8 @@
             "strike": 723.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 48.97,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.04,
             "put_ask": 0.05,
             "put_last": 0.05,
@@ -8999,8 +8812,8 @@
             "strike": 724.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 49.21,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.04,
             "put_ask": 0.05,
             "put_last": 0.06,
@@ -9010,8 +8823,8 @@
             "strike": 725.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 47.1,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.04,
             "put_ask": 0.05,
             "put_last": 0.08,
@@ -9021,8 +8834,8 @@
             "strike": 726.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 48.06,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.04,
             "put_ask": 0.05,
             "put_last": 0.06,
@@ -9032,8 +8845,8 @@
             "strike": 727.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 46.38,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.04,
             "put_ask": 0.05,
             "put_last": 0.06,
@@ -9043,8 +8856,8 @@
             "strike": 728.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 45.04,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.05,
             "put_ask": 0.06,
             "put_last": 0.04,
@@ -9054,8 +8867,8 @@
             "strike": 729.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 45.44,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.05,
             "put_ask": 0.06,
             "put_last": 0.05,
@@ -9076,8 +8889,8 @@
             "strike": 731.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 41.94,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.05,
             "put_ask": 0.06,
             "put_last": 0.07,
@@ -9131,8 +8944,8 @@
             "strike": 736.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 37.49,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.06,
             "put_ask": 0.07,
             "put_last": 0.06,
@@ -9142,8 +8955,8 @@
             "strike": 737.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 36.03,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.06,
             "put_ask": 0.07,
             "put_last": 0.06,
@@ -9164,8 +8977,8 @@
             "strike": 739.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 34.23,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.06,
             "put_ask": 0.07,
             "put_last": 0.09,
@@ -9186,8 +8999,8 @@
             "strike": 741.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 31.84,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.06,
             "put_ask": 0.07,
             "put_last": 0.08,
@@ -9208,8 +9021,8 @@
             "strike": 743.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 30.82,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.07,
             "put_ask": 0.08,
             "put_last": 0.07,
@@ -9219,8 +9032,8 @@
             "strike": 744.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 29.65,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.07,
             "put_ask": 0.08,
             "put_last": 0.09,
@@ -9241,8 +9054,8 @@
             "strike": 746.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 27.67,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.07,
             "put_ask": 0.08,
             "put_last": 0.07,
@@ -9252,8 +9065,8 @@
             "strike": 747.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 27.08,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.08,
             "put_ask": 0.09,
             "put_last": 0.09,
@@ -9263,8 +9076,8 @@
             "strike": 748.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 26.04,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.08,
             "put_ask": 0.09,
             "put_last": 0.09,
@@ -9307,8 +9120,8 @@
             "strike": 752.0,
             "call_bid": null,
             "call_ask": null,
-            "call_last": null,
-            "call_yahoo_iv": null,
+            "call_last": 22.23,
+            "call_yahoo_iv": 0.0,
             "put_bid": 0.1,
             "put_ask": 0.11,
             "put_last": 0.09,
@@ -9843,6 +9656,17 @@
             "put_yahoo_iv": null
           },
           {
+            "strike": 801.0,
+            "call_bid": null,
+            "call_ask": null,
+            "call_last": 0.02,
+            "call_yahoo_iv": 0.0,
+            "put_bid": null,
+            "put_ask": null,
+            "put_last": null,
+            "put_yahoo_iv": null
+          },
+          {
             "strike": 802.0,
             "call_bid": 0.01,
             "call_ask": 0.02,
@@ -9947,6 +9771,39 @@
             "call_ask": 0.02,
             "call_last": 0.01,
             "call_yahoo_iv": 0.187508125,
+            "put_bid": null,
+            "put_ask": null,
+            "put_last": null,
+            "put_yahoo_iv": null
+          },
+          {
+            "strike": 825.0,
+            "call_bid": null,
+            "call_ask": null,
+            "call_last": 0.03,
+            "call_yahoo_iv": 0.0,
+            "put_bid": null,
+            "put_ask": null,
+            "put_last": null,
+            "put_yahoo_iv": null
+          },
+          {
+            "strike": 830.0,
+            "call_bid": null,
+            "call_ask": null,
+            "call_last": 0.01,
+            "call_yahoo_iv": 0.0,
+            "put_bid": null,
+            "put_ask": null,
+            "put_last": null,
+            "put_yahoo_iv": null
+          },
+          {
+            "strike": 840.0,
+            "call_bid": null,
+            "call_ask": null,
+            "call_last": 0.02,
+            "call_yahoo_iv": 0.0,
             "put_bid": null,
             "put_ask": null,
             "put_last": null,
@@ -14253,8 +14110,8 @@
           },
           {
             "strike": 7220.0,
-            "call_bid": 470.6,
-            "call_ask": 478.6,
+            "call_bid": 568.3,
+            "call_ask": 589.5,
             "call_last": 665.89,
             "call_yahoo_iv": 1e-05,
             "put_bid": 0.65,
@@ -14308,8 +14165,8 @@
           },
           {
             "strike": 7245.0,
-            "call_bid": 551.9,
-            "call_ask": 552.9,
+            "call_bid": 556.2,
+            "call_ask": 560.2,
             "call_last": 516.12,
             "call_yahoo_iv": 1e-05,
             "put_bid": 0.85,
@@ -15962,10 +15819,10 @@
             "call_ask": 1.4,
             "call_last": 1.15,
             "call_yahoo_iv": 0.0998930344,
-            "put_bid": 214.7,
-            "put_ask": 215.5,
+            "put_bid": null,
+            "put_ask": null,
             "put_last": 173.08,
-            "put_yahoo_iv": 0.2413100772
+            "put_yahoo_iv": 0.0
           },
           {
             "strike": 8000.0,
@@ -15995,10 +15852,10 @@
             "call_ask": 0.85,
             "call_last": 0.65,
             "call_yahoo_iv": 0.0979704462,
-            "put_bid": 215.6,
-            "put_ask": 216.9,
+            "put_bid": 222.3,
+            "put_ask": 243.2,
             "put_last": 268.4,
-            "put_yahoo_iv": 0.2033465897
+            "put_yahoo_iv": 0.2928079753
           },
           {
             "strike": 8015.0,
@@ -16061,10 +15918,10 @@
             "call_ask": 0.6,
             "call_last": 0.35,
             "call_yahoo_iv": 0.1046232117,
-            "put_bid": 396.8,
-            "put_ask": 400.1,
+            "put_bid": 319.7,
+            "put_ask": 321.9,
             "put_last": 329.9,
-            "put_yahoo_iv": 0.6636233589
+            "put_yahoo_iv": 0.4583107758
           },
           {
             "strike": 8045.0,
@@ -16138,10 +15995,10 @@
             "call_ask": 0.4,
             "call_last": 0.25,
             "call_yahoo_iv": 0.1118252881,
-            "put_bid": 278.8,
-            "put_ask": 279.7,
+            "put_bid": 285.9,
+            "put_ask": 287.2,
             "put_last": 374.0,
-            "put_yahoo_iv": 0.2343826562
+            "put_yahoo_iv": 0.2659375165
           },
           {
             "strike": 8080.0,
@@ -16171,10 +16028,10 @@
             "call_ask": 0.35,
             "call_last": 0.25,
             "call_yahoo_iv": 0.1152432227,
-            "put_bid": 290.8,
-            "put_ask": 298.4,
+            "put_bid": 299.8,
+            "put_ask": 301.1,
             "put_last": 393.2,
-            "put_yahoo_iv": 0.2596891048
+            "put_yahoo_iv": 0.2709728665
           },
           {
             "strike": 8095.0,
@@ -16237,10 +16094,10 @@
             "call_ask": 0.3,
             "call_last": 0.2,
             "call_yahoo_iv": 0.1235439209,
-            "put_bid": 427.8,
-            "put_ask": 448.2,
+            "put_bid": 322.4,
+            "put_ask": 343.5,
             "put_last": 345.74,
-            "put_yahoo_iv": 0.6251334484
+            "put_yahoo_iv": 0.33796591
           },
           {
             "strike": 8125.0,
@@ -16248,10 +16105,10 @@
             "call_ask": 0.3,
             "call_last": 0.17,
             "call_yahoo_iv": 0.1252528882,
-            "put_bid": 325.7,
-            "put_ask": 333.2,
+            "put_bid": 332.3,
+            "put_ask": 333.7,
             "put_last": 422.25,
-            "put_yahoo_iv": 0.2798686516
+            "put_yahoo_iv": 0.2820964125
           },
           {
             "strike": 8130.0,
@@ -16325,10 +16182,10 @@
             "call_ask": 0.25,
             "call_last": 0.2,
             "call_yahoo_iv": 0.1344080701,
-            "put_bid": 510.2,
-            "put_ask": 513.9,
+            "put_bid": 416.7,
+            "put_ask": 440.2,
             "put_last": 416.38,
-            "put_yahoo_iv": 0.75168095
+            "put_yahoo_iv": 0.5137682901
           },
           {
             "strike": 8170.0,
@@ -16336,10 +16193,10 @@
             "call_ask": 0.3,
             "call_last": 0.2,
             "call_yahoo_iv": 0.1406335938,
-            "put_bid": 478.3,
-            "put_ask": 497.9,
+            "put_bid": 370.4,
+            "put_ask": 391.6,
             "put_last": 381.43,
-            "put_yahoo_iv": 0.6661639219
+            "put_yahoo_iv": 0.3629977031
           },
           {
             "strike": 8175.0,
@@ -16347,10 +16204,10 @@
             "call_ask": 0.25,
             "call_last": 0.15,
             "call_yahoo_iv": 0.1394129028,
-            "put_bid": 375.5,
-            "put_ask": 383.0,
+            "put_bid": 379.5,
+            "put_ask": 384.1,
             "put_last": 465.53,
-            "put_yahoo_iv": 0.3081047584
+            "put_yahoo_iv": 0.3132698068
           },
           {
             "strike": 8180.0,
@@ -16413,10 +16270,10 @@
             "call_ask": 0.2,
             "call_last": 0.15,
             "call_yahoo_iv": 0.1522301575,
-            "put_bid": 425.0,
-            "put_ask": 432.7,
+            "put_bid": 428.5,
+            "put_ask": 433.0,
             "put_last": 512.68,
-            "put_yahoo_iv": 0.3348607774
+            "put_yahoo_iv": 0.3363637531
           },
           {
             "strike": 8230.0,
@@ -16424,10 +16281,10 @@
             "call_ask": 0.2,
             "call_last": 0.15,
             "call_yahoo_iv": 0.1538170557,
-            "put_bid": 410.6,
-            "put_ask": 492.0,
+            "put_bid": 433.4,
+            "put_ask": 437.6,
             "put_last": 532.06,
-            "put_yahoo_iv": 0.543972761
+            "put_yahoo_iv": 0.3371343143
           },
           {
             "strike": 8240.0,
@@ -16468,10 +16325,10 @@
             "call_ask": 0.2,
             "call_last": 0.1,
             "call_yahoo_iv": 0.1665122412,
-            "put_bid": 470.6,
-            "put_ask": 477.7,
+            "put_bid": 472.8,
+            "put_ask": 477.0,
             "put_last": 552.12,
-            "put_yahoo_iv": 0.3595797685
+            "put_yahoo_iv": 0.3558871785
           },
           {
             "strike": 8275.0,
@@ -16523,10 +16380,10 @@
             "call_ask": 0.2,
             "call_last": 0.25,
             "call_yahoo_iv": 0.1790853577,
-            "put_bid": 509.8,
-            "put_ask": 517.5,
+            "put_bid": 512.1,
+            "put_ask": 516.6,
             "put_last": 592.33,
-            "put_yahoo_iv": 0.3799958241
+            "put_yahoo_iv": 0.3750520259
           },
           {
             "strike": 8320.0,
@@ -16556,10 +16413,10 @@
             "call_ask": 0.2,
             "call_last": 0.22,
             "call_yahoo_iv": 0.1853108813,
-            "put_bid": 529.7,
-            "put_ask": 537.5,
+            "put_bid": 527.5,
+            "put_ask": 545.6,
             "put_last": 610.5,
-            "put_yahoo_iv": 0.3905853178
+            "put_yahoo_iv": 0.4318904468
           },
           {
             "strike": 8340.0,
@@ -16600,10 +16457,10 @@
             "call_ask": 0.2,
             "call_last": 0.1,
             "call_yahoo_iv": 0.1976398596,
-            "put_bid": 569.8,
-            "put_ask": 577.5,
+            "put_bid": 567.2,
+            "put_ask": 585.3,
             "put_last": 648.5,
-            "put_yahoo_iv": 0.4114743912
+            "put_yahoo_iv": 0.4525430112
           },
           {
             "strike": 8375.0,
@@ -16677,10 +16534,10 @@
             "call_ask": 0.2,
             "call_last": 0.2,
             "call_yahoo_iv": 0.2143633252,
-            "put_bid": 852.3,
-            "put_ask": 863.9,
+            "put_bid": 885.0,
+            "put_ask": 892.8,
             "put_last": 777.0,
-            "put_yahoo_iv": 1.1858294188
+            "put_yahoo_iv": 1.2694013886
           },
           {
             "strike": 8430.0,
