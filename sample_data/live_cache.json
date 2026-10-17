@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17 04:01:04Z",
+  "generated_at": "2026-10-17 10:29:02Z",
   "note": "Cached live Yahoo snapshot for GitHub Pages / stlite. Browsers cannot call Yahoo directly (CORS). Local Streamlit still fetches live.",
   "snapshots": {
     "SPX": {
@@ -3395,7 +3395,7 @@
             "call_yahoo_iv": null,
             "put_bid": 3.7,
             "put_ask": 4.0,
-            "put_last": 2.3,
+            "put_last": 3.3,
             "put_yahoo_iv": 0.2775340802
           },
           {
@@ -3483,7 +3483,7 @@
             "call_yahoo_iv": 0.2740703697,
             "put_bid": 4.0,
             "put_ask": 4.4,
-            "put_last": 2.6,
+            "put_last": 3.7,
             "put_yahoo_iv": 0.2531202618
           },
           {
@@ -5121,7 +5121,7 @@
             "call_yahoo_iv": 0.4294414356,
             "put_bid": 5.2,
             "put_ask": 5.7,
-            "put_last": 3.7,
+            "put_last": 4.9,
             "put_yahoo_iv": 0.3198157619
           },
           {
@@ -12512,7 +12512,7 @@
             "call_yahoo_iv": null,
             "put_bid": 3.7,
             "put_ask": 4.0,
-            "put_last": 2.3,
+            "put_last": 3.3,
             "put_yahoo_iv": 0.2775340802
           },
           {
@@ -12600,7 +12600,7 @@
             "call_yahoo_iv": 0.2740703697,
             "put_bid": 4.0,
             "put_ask": 4.4,
-            "put_last": 2.6,
+            "put_last": 3.7,
             "put_yahoo_iv": 0.2531202618
           },
           {
@@ -14238,7 +14238,7 @@
             "call_yahoo_iv": 0.4294414356,
             "put_bid": 5.2,
             "put_ask": 5.7,
-            "put_last": 3.7,
+            "put_last": 4.9,
             "put_yahoo_iv": 0.3198157619
           },
           {
