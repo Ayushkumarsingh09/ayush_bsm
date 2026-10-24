@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-24 04:14:56Z",
+  "generated_at": "2026-10-24 10:43:32Z",
   "note": "Cached live Yahoo snapshot for GitHub Pages / stlite. Browsers cannot call Yahoo directly (CORS). Local Streamlit still fetches live.",
   "snapshots": {
     "SPX": {
@@ -32,7 +32,7 @@
     },
     "ES": {
       "symbol": "ES=F",
-      "spot": 7672.5,
+      "spot": 7659.75,
       "asof": "2026-10-23 21:00:00",
       "risk_free_rate": 0.04032,
       "rate_source": "^IRX (13-week T-bill) via query1.finance.yahoo.com",
